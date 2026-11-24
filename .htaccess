@@ -1,0 +1,5 @@
+# Untuk pemasangan di hosting Apache: blokir folder data dan bin
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^(data|bin)(/|$) - [F,L]
+</IfModule>

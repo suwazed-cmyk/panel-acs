@@ -1,0 +1,7 @@
+# Data pengguna (database, pengaturan, kunci panel) tidak boleh masuk repo
+data/
+*.db
+*.db-wal
+*.db-shm
+*.bak
+.DS_Store
