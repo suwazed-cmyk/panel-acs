@@ -874,7 +874,6 @@ function page_device($S, $acs, $id)
     $tg = ip_target($d['ip']);
     $loc = locations_all();
     $PRl = panel_routers()['linked'];
-    $panelUrl = isset(panel_routers()['panel']['url']) ? rtrim(panel_routers()['panel']['url'], '/') : '';
 
     // Daftar WLAN
     $wlans = [];
@@ -1056,7 +1055,7 @@ function page_device($S, $acs, $id)
                     <h2><?= h($d['name'] !== '' ? $d['name'] : 'Tanpa nama') ?></h2>
                     <div class="dh-meta">
                         <span class="mono"><?= h($d['serial']) ?></span><span>·</span><span><?= h($d['pc']) ?></span><span>·</span><span><?= h($d['brand']) ?></span>
-                        <?php if ($d['group'] !== ''): ?><?php if ($d['router_id'] !== '' && $panelUrl): ?><a class="tag g" href="<?= h($panelUrl . '/#/router/' . $d['router_id']) ?>" target="_blank" rel="noopener" title="Buka router di panel utama"><?= h($d['group']) ?><?= $d['router_on'] === false ? ' · VPN terputus' : '' ?></a><?php else: ?><span class="tag g"><?= h($d['group']) ?></span><?php endif; ?><?php endif; ?>
+                        <?php if ($d['group'] !== ''): ?><span class="tag g"><?= h($d['group']) ?><?= $d['router_id'] !== '' && $d['router_on'] === false ? ' · VPN terputus' : '' ?></span><?php endif; ?>
                         <?php if ($d['area'] !== ''): ?><span class="tag"><?= h($d['area']) ?></span><?php endif; ?>
                     </div>
                 </div>
@@ -1493,10 +1492,9 @@ function page_settings($S)
                         <dl class="kvl">
                             <div><dt>Status</dt><dd><?= $PRs['ok'] ? '<span class="badge good">Terhubung</span>' : '<span class="badge poor">Gagal</span>' ?></dd></div>
                             <div><dt>Router</dt><dd><?= nf(count($PRs['routers'])) ?></dd></div>
-                            <?php if (!empty($PRs['panel']['url'])): ?><div><dt>Alamat</dt><dd><a href="<?= h(rtrim($PRs['panel']['url'], '/')) ?>/" target="_blank" rel="noopener"><?= h($PRs['panel']['url']) ?></a></dd></div><?php endif; ?>
                         </dl>
                         <?php if ($PRs['error']): ?><div class="alert err" style="margin-top:10px"><?= h($PRs['error']) ?></div><?php endif; ?>
-                        <p class="muted small" style="margin:10px 0 0">Router setiap ONT ditentukan dari IP virtual router di panel utama. Tambah atau ubah router di panel utama, Panel ACS ikut menyesuaikan.</p>
+                        <p class="muted small" style="margin:10px 0 0">Router setiap ONT ditentukan dari IP virtual router di panel utama. Router diatur oleh super admin di panel utama; Panel ACS ikut menyesuaikan.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1812,8 +1810,6 @@ function layout_start($S, $page, $title, $error, $flash)
     if (in_array($host, ['127.0.0.1', 'localhost'], true)) {
         $host = 'GenieACS lokal';
     }
-    $PRx = panel_routers();
-    $panelHome = isset($PRx['panel']['url']) ? rtrim($PRx['panel']['url'], '/') . '/' : '';
     ?><!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1837,7 +1833,6 @@ function layout_start($S, $page, $title, $error, $flash)
         <?php foreach ($nav as $k => $n): ?>
             <a href="?page=<?= $k ?>" class="<?= $cur === $k ? 'on' : '' ?>"><?= icon($n[1]) ?><?= $n[0] ?></a>
         <?php endforeach; ?>
-        <?php if ($panelHome): ?><a href="<?= h($panelHome) ?>" title="Kembali ke panel utama"><?= icon('back') ?><?= h(isset($PRx['panel']['name']) ? $PRx['panel']['name'] : 'Panel utama') ?></a><?php endif; ?>
     </nav>
     <div class="side-user">
         <span class="av"><?= h(strtoupper(substr($S['admin_user'], 0, 1))) ?></span>
