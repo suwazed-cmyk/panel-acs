@@ -122,7 +122,7 @@ function default_settings()
 {
     return [
         'app_name'       => 'Panel ACS',
-        'acs_url'        => 'http://127.0.0.1:7557', // alamat NBI GenieACS (bukan UI port 3000)
+        'acs_url'        => (panel_link() && !empty(panel_link()['nbi'])) ? panel_link()['nbi'] : 'http://127.0.0.1:7557', // alamat NBI GenieACS (bukan UI port 3000)
         'acs_user'       => '',                      // isi jika NBI pakai basic auth
         'acs_pass'       => '',
         'online_minutes' => 10,                      // dianggap offline jika tidak inform > X menit
