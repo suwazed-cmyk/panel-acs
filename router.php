@@ -4,7 +4,7 @@
  * Folder data/ dan bin/ serta berkas tersembunyi tidak boleh dibuka dari web.
  */
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (preg_match('#^/(data|bin)(/|$)#', $path) || preg_match('#/\.#', $path) || preg_match('#\.(db|json|lock|bak|md|sh)$#i', $path)) {
+if (preg_match('#^/(data|bin)(/|$)#', $path) || preg_match('#/\.#', $path) || preg_match('#\.(db|json|lock|bak|sh)$#i', $path)) {
     http_response_code(403);
     echo 'Forbidden';
     return true;

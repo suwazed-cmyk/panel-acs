@@ -1082,7 +1082,6 @@ function page_device($S, $acs, $id)
         <div class="rx-stats" id="rxStats"></div>
         <div class="rx-wrap"><canvas id="rxChart"></canvas><div class="rx-empty muted" id="rxEmpty" hidden></div></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var GOOD = <?= json_encode((float) $S['rx_good']) ?>, FAIR = <?= json_encode((float) $S['rx_fair']) ?>, chart = null;
@@ -1325,7 +1324,7 @@ function page_mapping($S, $devs)
         ];
     }
     ?>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="assets/leaflet/leaflet.css">
     <div class="card">
         <?= card_head('map', 'Mapping Perangkat') ?>
         <div class="filters">
@@ -1341,7 +1340,7 @@ function page_mapping($S, $devs)
         <p class="muted small" style="padding:0 20px 12px;margin:0">Pilih perangkat, lalu klik di peta untuk menyimpan lokasinya. Marker hijau = online, merah = offline.</p>
         <div id="map"></div>
     </div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="assets/leaflet/leaflet.js"></script>
     <script>
     var DEVS = <?= json_encode($list) ?>, markers = {};
     var map = L.map('map').setView([-2.5, 118], 5);
@@ -1872,7 +1871,7 @@ function layout_end()
 </main>
 <footer>© <?= date('Y') ?> · GenieACS Monitoring Panel</footer>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="assets/chart.umd.js"></script>
 <script>
 var CSRF = <?= json_encode(csrf_token()) ?>;
 var ICON_SUN = <?= json_encode(icon('sun')) ?>, ICON_MOON = <?= json_encode(icon('moon')) ?>;
