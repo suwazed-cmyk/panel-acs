@@ -696,7 +696,7 @@ async function viewDevice(v, id) {
       <div class="tt"><h1>${d.name ? esc(d.name) : `<span class="muted" style="font-weight:600">Tanpa nama</span>`} ${d.online ? `<span class="pill ok">Online</span>` : `<span class="pill bad">Offline</span>`}</h1>
         <div class="meta"><span class="mono">${esc(d.serial)}</span><span>${esc(d.brand)} ${esc(d.pc)}</span>${R ? `<span>${ic("router")}${esc(R.name)}</span>` : ""}<span>${ic("clock")}Lapor ${ago(d.last)}</span></div>
         ${d.labels.length ? `<div class="labels" style="margin-top:8px">${d.labels.map((t) => `<span class="tag">${esc(t.replace(/_/g, " "))}</span>`).join("")}</div>` : ""}</div>
-      <div class="acts"><button class="btn" id="aRefresh">${ic("refresh")}Baca ulang</button><button class="btn danger" id="aReboot">${ic("power")}Reboot</button></div>
+      <div class="acts">${d.panelLinked && R ? `<button class="btn" id="aWeb" title="Buka web ONT lewat IP VPS tanpa VPN (berlaku 1 jam)">${ic("globe")}Web ONT</button>` : ""}<button class="btn" id="aRefresh">${ic("refresh")}Baca ulang</button><button class="btn danger" id="aReboot">${ic("power")}Reboot</button></div>
     </div>
     ${!d.online ? `<div class="note warn">${ic("alert")}<div><b>ONT tidak melapor ${d.last ? "sejak " + ago(d.last) : ""}</b>${d.informIv ? `Interval inform ${d.informIv >= 3600 ? d.informIv / 3600 + " jam" : Math.round(d.informIv / 60) + " menit"}. ` : ""}${R && R.online === false ? `Router <b style="display:inline">${esc(R.name)}</b> di panel utama sedang terputus.` : "Jika ONT tetap hidup di lokasi, kemungkinan inform berkalanya jarang/mati: perbaiki dari panel utama → GenieACS → Inform berkala ONT."}</div></div>` : ""}
     <div class="det">
@@ -743,6 +743,14 @@ async function viewDevice(v, id) {
     </div>`;
   paintIcons(v);
   $("#aRefresh").onclick = async () => { const b = $("#aRefresh"); busy(b, true); try { const r = await api("device/action", { method: "POST", body: { id: d.id, action: "refresh", tr181: d.tr181 } }); toast(r.msg); if (!r.queued) setTimeout(() => viewDevice(v, d.id), 800); } catch (e) { toast(e.message, true); } busy(b, false); };
+  if ($("#aWeb")) $("#aWeb").onclick = async () => {
+    const b = $("#aWeb"), w = window.open("", "_blank");
+    if (w) { try { w.document.write('<p style="font-family:system-ui;padding:30px;color:#445">Membuka web ONT…</p>'); } catch (e) {} }
+    busy(b, true);
+    try { const r = await api("device/web", { method: "POST", body: { id: d.id, label: [d.serial, d.name].filter(Boolean).join(" · ") } }); if (w) w.location.href = r.url; else location.href = r.url; toast(`Web ONT dibuka di port ${r.port}`); }
+    catch (e) { if (w) w.close(); toast(e.message, true); }
+    busy(b, false);
+  };
   $("#aReboot").onclick = () => confirmBox("Reboot ONT?", `ONT <b>${esc(d.name || d.serial)}</b> akan restart dan pelanggan terputus sekitar 1–2 menit.`, "Reboot", true, async () => { const r = await api("device/action", { method: "POST", body: { id: d.id, action: "reboot" } }); closeModal(); toast(r.msg); });
   v.querySelectorAll("[data-wifi]").forEach((b) => (b.onclick = () => wifiDialog(d, b.dataset.wifi, b.dataset.ssid)));
   $("#tagEdit").onclick = () => tagDialog(d);

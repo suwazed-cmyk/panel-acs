@@ -20,7 +20,7 @@ const DB_FILE = path.join(DATA_DIR, "panel-acs.db");
 const LINK_FILE = path.join(DATA_DIR, "panel-link.json");
 const PORT = parseInt(process.env.PORT, 10) || 8091;
 const HOST = process.env.HOST || "127.0.0.1";
-const VERSION = "3.1.1";
+const VERSION = "3.2.0";
 const RX_RAW_DAYS = 7;
 const RX_PROVISION = "panel-acs-rx";
 const COLLECT_MS = 15 * 60 * 1000;
@@ -862,6 +862,20 @@ async function handle(req, res) {
     else return send(res, 400, { error: "Aksi tidak dikenal." });
     DEVCACHE.t = 0;
     return send(res, r.ok ? 200 : 400, r.ok ? r : { error: r.msg });
+  }
+  // Buka web ONT lewat pintu web ONT panel utama (tanpa VPN, satu port per ONT, berlaku 1 jam)
+  if (p === "/api/device/web" && method === "POST") {
+    const link = panelLink();
+    if (!link) return send(res, 400, { error: "Panel utama belum terhubung, web ONT tidak bisa dibuka lewat VPS." });
+    const raw = await nbi(S).device(String(body.id || ""));
+    if (!raw) return send(res, 404, { error: "ONT tidak ditemukan di GenieACS." });
+    const ip = tr069Ip(raw);
+    if (!ip) return send(res, 400, { error: "IP TR-069 ONT belum diketahui. Tunggu ONT melapor ke GenieACS." });
+    const host = String(req.headers["x-forwarded-host"] || req.headers.host || "").split(",")[0].trim().replace(/:\d+$/, "");
+    const label = String(body.label || "").slice(0, 80);
+    const r = await request("POST", link.url.replace(/\/$/, "") + "/api/addon/ont-open", { ip, label, host }, { "X-Addon-Key": link.key }, 15000);
+    if (r.status === 200 && r.json && r.json.url) return send(res, 200, r.json);
+    return send(res, 400, { error: (r.json && r.json.error) || (r.status === 0 ? `Panel utama tidak menjawab (${r.error})` : `Panel utama menolak (HTTP ${r.status})`) });
   }
   if (p === "/api/device/wifi" && method === "POST") {
     const id = String(body.id || "");

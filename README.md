@@ -8,6 +8,7 @@ Versi 3 ditulis ulang dengan **Node.js** (tanpa PHP, tanpa dependensi npm) dan d
 - **Dashboard**: total/online/offline, redaman buruk, ONT yang perlu perhatian, redaman memburuk 24 jam, status per router, kualitas redaman, merek ONT.
 - **ONT**: cari (nama, label, SN, PPPoE, IP, SSID), saring status/redaman/router, urutkan kolom, unduh CSV.
 - **Detail ONT**: redaman, suhu, klien WiFi, history redaman (24 jam–90 hari), WiFi (ubah SSID/password), koneksi WAN, perangkat terhubung, reboot, baca ulang.
+- **Web ONT** (tombol di detail ONT): buka web ONT lewat IP VPS tanpa VPN, memakai pintu web ONT panel utama (v2.17.0 ke atas). Berlaku 1 jam sejak terakhir dipakai, beberapa ONT bisa dibuka bersamaan.
 - **Router otomatis**: ONT dikelompokkan per router panel utama berdasarkan **IP virtual** (IP TR-069 ONT), tanpa tag router.
 - **Nama pelanggan & label** disimpan sebagai tag GenieACS: `nama:Budi_Santoso` untuk nama, tag lain sebagai label bebas (ODP, paket, VIP, dll). Tag versi lama (tag ke-2 = nama) tetap terbaca.
 - **History redaman**: dicatat tiap 15 menit oleh aplikasi sendiri (tidak perlu cron/timer), mentah 7 hari lalu diringkas per jam, disimpan 14–730 hari. Provision `panel-acs-rx` membuat GenieACS membaca ulang RX setiap inform berkala.
