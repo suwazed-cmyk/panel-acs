@@ -1,58 +1,31 @@
 # Panel ACS
 
-Monitoring ONT dari **GenieACS**: daftar dan detail ONT, **history redaman (RX)** dengan grafik, ubah WiFi, reboot, refresh, tag pelanggan, faults, dan peta lokasi ONT.
+Monitoring ONT dari **GenieACS** untuk ISP/RT-RW Net: redaman (RX) dengan history grafik, status online, WiFi, perangkat terhubung, dan nama pelanggan. Add-on untuk [ACS NETMAP Panel](https://github.com/suwazed-cmyk/acs-netmap-panel).
 
-Dirancang sebagai **add-on** untuk [ACS NETMAP Panel](https://github.com/suwazed-cmyk/acs-netmap-panel), tetapi juga bisa dipasang mandiri.
+Versi 3 ditulis ulang dengan **Node.js** (tanpa PHP, tanpa dependensi npm) dan desain baru yang seragam dengan panel utama.
 
 ## Fitur
+- **Dashboard**: total/online/offline, redaman buruk, ONT yang perlu perhatian, redaman memburuk 24 jam, status per router, kualitas redaman, merek ONT.
+- **ONT**: cari (nama, label, SN, PPPoE, IP, SSID), saring status/redaman/router, urutkan kolom, unduh CSV.
+- **Detail ONT**: redaman, suhu, klien WiFi, history redaman (24 jam–90 hari), WiFi (ubah SSID/password), koneksi WAN, perangkat terhubung, reboot, baca ulang.
+- **Router otomatis**: ONT dikelompokkan per router panel utama berdasarkan **IP virtual** (IP TR-069 ONT), tanpa tag router.
+- **Nama pelanggan & label** disimpan sebagai tag GenieACS: `nama:Budi_Santoso` untuk nama, tag lain sebagai label bebas (ODP, paket, VIP, dll). Tag versi lama (tag ke-2 = nama) tetap terbaca.
+- **History redaman**: dicatat tiap 15 menit oleh aplikasi sendiri (tidak perlu cron/timer), mentah 7 hari lalu diringkas per jam, disimpan 14–730 hari. Provision `panel-acs-rx` membuat GenieACS membaca ulang RX setiap inform berkala.
+- **Faults** GenieACS: lihat dan hapus.
 
-- **Dashboard**: jumlah ONT online/offline, sebaran kualitas RX, status per router, ONT yang perlu perhatian, **redaman memburuk dalam 24 jam**.
-- **ONT Devices**: daftar dengan filter router, status, RX, model, dan kolom **Δ 24 jam** (perubahan redaman).
-- **Detail ONT**: info lengkap, **grafik history redaman** 24 jam / 7 hari / 30 hari / 90 hari (dengan garis ambang Excellent/Fair), ubah SSID & password WiFi, reboot, refresh, area dan nama pelanggan.
-- **Router otomatis**: ONT dikelompokkan per router panel utama berdasarkan **IP virtual**, tanpa mengisi tag atau prefix manual.
-- **Faults** dan **Mapping** (peta lokasi ONT dengan OpenStreetMap).
-- Data tersimpan di **SQLite** (`data/panel-acs.db`), tanpa server database.
+## Pemasangan
+Panel utama → **Add-on → Panel ACS → Install**. Panel memasang Node.js 22 khusus add-on bila Node di VPS lebih lama dari 22.13 (Node milik GenieACS tidak diubah), lalu menjalankan layanan `addon-panel-acs`.
 
-## Pemasangan sebagai add-on (disarankan)
+Pembaruan dari versi PHP: klik **Perbarui**. Database `data/panel-acs.db` dipakai apa adanya (history, lokasi, pengaturan tidak hilang). Password admin lama tetap berlaku dan diganti ke format baru saat login pertama.
 
-Di panel utama: **Add-on → Panel ACS → Install**. Panel utama akan:
-
-1. memasang PHP (`php-cli`, `php-sqlite3`, `php-curl`, `php-mbstring`) jika belum ada,
-2. mengunduh repo ini ke `/opt/addons/panel-acs`,
-3. menyiapkan database dan penghubung ke panel utama (`data/panel-link.json`),
-4. menjalankan layanan `addon-panel-acs` (127.0.0.1:8091) dan timer pencatat redaman tiap 15 menit,
-5. membuka Panel ACS di alamat panel utama, misalnya `https://domainanda.com/acs/`.
-
-Saat pertama dibuka, Panel ACS meminta Anda **membuat akun admin**. Tidak ada password bawaan.
-
-NBI GenieACS dibaca dari dalam VPS (`http://127.0.0.1:7557`), jadi port 7557 **tidak perlu** dan **tidak boleh** dibuka ke internet.
-
-## History redaman
-
-- `bin/collect.php` membaca RX semua ONT dari GenieACS tiap 15 menit dan menyimpan titik baru (hanya bila GenieACS benar-benar membaca ulang nilainya).
-- Data 7 hari terakhir disimpan detail; data lebih lama diringkas per jam dan disimpan sesuai pengaturan (bawaan 90 hari).
-- Parameter GenieACS bawaan biasanya membaca RX **sekali sehari**. Supaya grafik lebih rapat, buka **Settings → History Redaman → Pasang provision RX**. Panel menambah provision `panel-acs-rx` dan preset-nya agar RX dibaca ulang setiap Inform berkala. Provision lain tidak diubah, dan bisa dihapus kapan saja dari tempat yang sama.
-
-## Tag GenieACS
-
-| Tag | Arti |
-|---|---|
-| Tag 1 | Area / kelompok (opsional), misalnya ODP atau dusun |
-| Tag 2 | Nama pelanggan |
-
-Jika ONT hanya punya satu tag, tag itu dianggap nama pelanggan. Router **tidak** diambil dari tag, tetapi dari panel utama.
-
-## Pemasangan mandiri (tanpa panel utama)
-
-1. Salin isi repo ke server PHP 7.4+ dengan ekstensi `pdo_sqlite` dan `curl`.
-2. Folder `data/` harus bisa ditulis.
-3. Buka alamatnya, buat akun admin, lalu isi URL NBI di **Settings**.
-4. Jalankan pencatat redaman berkala, misalnya cron tiap 15 menit: `php /path/panel-acs/bin/collect.php`
-
-Tanpa panel utama, ONT dikelompokkan memakai tag 1 (area). NBI harus bisa dijangkau dari server itu dengan aman.
+### Mandiri (tanpa panel utama)
+```
+node --disable-warning=ExperimentalWarning server.js   # butuh Node.js 22.13+
+```
+Variabel: `PORT` (bawaan 8091), `HOST` (bawaan 127.0.0.1), `DATA_DIR` (bawaan `./data`). Buka di browser, buat akun admin, lalu isi alamat NBI GenieACS di Pengaturan (bawaan `http://127.0.0.1:7557`).
 
 ## Data
+`data/` (tidak masuk repo): `panel-acs.db` (SQLite), `panel-link.json` (alamat + kunci panel utama, ditulis panel utama).
 
-Folder `data/` berisi database, pengaturan, dan kunci penghubung panel. Folder ini **tidak** ikut repo (`.gitignore`). Backup cukup salin `data/panel-acs.db`.
-
-Data versi lama (`settings.json`, `locations.json`) diimpor otomatis saat pertama dijalankan; berkas lama disimpan sebagai `.bak`.
+## Lisensi
+MIT. Chart.js 4.4.1 (MIT) disertakan di `assets/`.

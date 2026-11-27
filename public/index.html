@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel ACS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231d4ed8%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M22%2024a14%2014%200%200%201%2020%200%22%2F%3E%3Cpath%20d%3D%22M16%2018a22%2022%200%200%201%2032%200%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%2214%22%20y%3D%2234%22%20width%3D%2236%22%20height%3D%2216%22%20rx%3D%224%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light;
+    --bg:#f6f7fb;--surface:#fff;--subtle:#f8f9fc;--hover:#f3f5fa;
+    --line:#e7e9f0;--line-2:#d9dde7;
+    --text:#1f2633;--text-2:#4b5565;--muted:#7b8494;
+    --primary:#1d4ed8;--primary-hover:#1e40af;--primary-soft:#eef3ff;--ring:rgba(29,78,216,.18);
+    --ok:#16a34a;--ok-soft:#ecfdf3;--warn:#d97706;--warn-soft:#fffbeb;--bad:#dc2626;--bad-soft:#fef2f2;
+    --side:#0f2a6b;--side-text:rgba(255,255,255,.72);--side-hover:rgba(255,255,255,.07);--side-on:rgba(255,255,255,.12);
+    --r:12px;--r-sm:8px;--shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.03);--shadow-lg:0 18px 48px -12px rgba(16,24,40,.28);
+    --font:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0d1117;--surface:#151b24;--subtle:#1a212c;--hover:#1d2531;
+    --line:#252e3b;--line-2:#323d4d;
+    --text:#e6ebf2;--text-2:#b4bdcb;--muted:#8591a3;
+    --primary:#5b8cff;--primary-hover:#7aa2ff;--primary-soft:#18243f;--ring:rgba(91,140,255,.25);
+    --ok:#3ccf74;--ok-soft:#10291b;--warn:#f0a73a;--warn-soft:#2c2111;--bad:#f26b6b;--bad-soft:#2d1516;
+    --side:#0b1530;--shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0}
+  body{min-height:100vh;background:var(--bg);color:var(--text);font:14px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin:0}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  a{color:var(--primary);text-decoration:none}
+  .mono{font-family:var(--mono);font-size:.92em}
+  .hidden{display:none!important}
+  .muted{color:var(--muted)}
+  .small{font-size:12.5px}
+  svg.i{width:18px;height:18px;flex:none}
+
+  /* Layout */
+  .side{position:fixed;inset:0 auto 0 0;width:248px;background:var(--side);display:flex;flex-direction:column;padding:18px 12px;z-index:40;transition:transform .22s ease}
+  .brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;color:#fff}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:grid;place-items:center}
+  .brand-mark svg{width:19px;height:19px}
+  .brand b{display:block;font-size:15.5px;font-weight:650;letter-spacing:-.01em;line-height:1.15}
+  .brand small{display:block;font-size:11px;color:var(--side-text)}
+  .nav{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;margin:1px 0;border:0;border-radius:var(--r-sm);background:none;color:var(--side-text);font-size:14px;font-weight:500;text-align:left}
+  .nav:hover{background:var(--side-hover);color:#fff}
+  .nav.on{background:var(--side-on);color:#fff}
+  .nav .cnt{margin-left:auto;font-size:11.5px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff}
+  .nav .cnt.bad{background:#dc2626}
+  .side .grow{flex:1}
+  .side-foot{border-top:1px solid rgba(255,255,255,.1);padding:12px 12px 0;font-size:12px;color:var(--side-text);display:flex;justify-content:space-between}
+  .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35;opacity:0;visibility:hidden;transition:.2s}
+  body.nav-open .backdrop{opacity:1;visibility:visible}
+  .main{margin-left:248px;min-height:100vh}
+  .top{height:60px;display:flex;align-items:center;gap:10px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .crumb{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;min-width:0}
+  .crumb a{color:var(--muted)}.crumb a:hover{color:var(--text)}
+  .crumb b{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top .sp{flex:1}
+  .conn{display:flex;align-items:center;gap:6px}
+  .chip-st{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;font-weight:550;color:var(--text-2);background:var(--surface);white-space:nowrap}
+  .chip-st i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .chip-st.ok i{background:var(--ok)}.chip-st.bad i{background:var(--bad)}.chip-st.warn i{background:var(--warn)}
+  .icon-btn{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:var(--r-sm);background:none;color:var(--text-2)}
+  .icon-btn:hover{background:var(--hover);color:var(--text)}
+  .icon-btn.spinning svg{animation:spin .8s linear infinite}
+  .menu-btn{display:none}
+  .content{padding:28px;max-width:1440px}
+  .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .ph h1{font-size:26px;font-weight:700;letter-spacing:-.025em;line-height:1.2}
+  .ph p{color:var(--muted);margin-top:4px}
+  .ph .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* Komponen */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);min-width:0}
+  .stack>*+*{margin-top:16px}
+  .ch{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);min-height:57px}
+  .ch h2{font-size:15px;font-weight:650;letter-spacing:-.01em}
+  .ch .sub{font-size:12.5px;color:var(--muted)}
+  .cb{padding:16px 20px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--surface);font-size:13.5px;font-weight:550;color:var(--text);white-space:nowrap;transition:background .12s,border-color .12s}
+  .btn:hover{background:var(--hover)}
+  .btn svg{width:16px;height:16px}
+  .btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn.pri:hover{background:var(--primary-hover)}
+  .btn.danger{color:var(--bad)}
+  .btn.danger:hover{background:var(--bad-soft);border-color:var(--bad)}
+  .btn.ghost{border-color:transparent;background:none}
+  .btn.ghost:hover{background:var(--hover)}
+  .btn.sm{height:30px;padding:0 10px;font-size:12.5px}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.busy{pointer-events:none;opacity:.75}
+  .btn.busy::before{content:"";width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+  .btn.busy svg{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  input[type=text],input[type=password],input[type=number],input[type=search],select,textarea{width:100%;height:38px;padding:0 12px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--surface);outline:none;transition:border-color .12s,box-shadow .12s}
+  textarea{height:auto;padding:10px 12px}
+  input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--ring)}
+  label{display:block;font-size:13px;font-weight:550;margin:14px 0 6px}
+  label:first-child{margin-top:0}
+  .help{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .help+label,.help+.row2 label{margin-top:18px}
+  .err{color:var(--bad);font-size:13px;margin-top:10px;min-height:0}
+  .err:empty{display:none}
+  .check{display:flex;align-items:center;gap:9px;font-weight:500;margin:14px 0 0;cursor:pointer}
+  .check input{width:16px;height:16px;accent-color:var(--primary);margin:0}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:550;white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.bad{background:var(--bad-soft);color:var(--bad)}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .pill.info{background:var(--primary-soft);color:var(--primary)}
+  .pill.gray{background:var(--subtle);color:var(--muted);border:1px solid var(--line)}
+  .pill.nodot::before{display:none}
+  .tag{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:6px;font-size:11.5px;font-weight:600;background:var(--subtle);color:var(--text-2);border:1px solid var(--line);white-space:nowrap}
+  .tag.blue{background:var(--primary-soft);color:var(--primary);border-color:transparent}
+  .tag button{border:0;background:none;padding:0;margin-left:2px;color:var(--muted);display:grid;place-items:center}
+  .tag button svg{width:12px;height:12px}
+  .tag button:hover{color:var(--bad)}
+  .note{display:flex;gap:12px;padding:13px 16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);margin-bottom:16px;font-size:13.5px;line-height:1.55}
+  .note svg{width:18px;height:18px;flex:none;margin-top:1px}
+  .note b{display:block;margin-bottom:2px}
+  .note.bad{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 30%,transparent)}.note.bad svg{color:var(--bad)}
+  .note.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent)}.note.warn svg{color:var(--warn)}
+  .note.info{background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 25%,transparent)}.note.info svg{color:var(--primary)}
+  .note.ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 30%,transparent)}.note.ok svg{color:var(--ok)}
+  .empty{padding:40px 20px;text-align:center;color:var(--muted)}
+  .empty .big{width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:var(--subtle);display:grid;place-items:center;color:var(--muted)}
+  .empty .big svg{width:24px;height:24px}
+  .empty h3{font-size:15px;color:var(--text);margin-bottom:4px}
+  .spin{display:inline-block;width:20px;height:20px;border:2.5px solid var(--line-2);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);display:block;color:inherit;transition:border-color .12s,box-shadow .12s}
+  a.kpi:hover{border-color:var(--line-2);box-shadow:0 6px 18px -10px rgba(16,24,40,.25)}
+  .kpi .kh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);font-weight:500}
+  .kpi .kh .ki{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--subtle);color:var(--text-2)}
+  .kpi .kh .ki svg{width:15px;height:15px}
+  .kpi .kh .ki.ok{background:var(--ok-soft);color:var(--ok)}.kpi .kh .ki.bad{background:var(--bad-soft);color:var(--bad)}.kpi .kh .ki.warn{background:var(--warn-soft);color:var(--warn)}.kpi .kh .ki.info{background:var(--primary-soft);color:var(--primary)}
+  .kpi b{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;margin-top:10px;font-variant-numeric:tabular-nums}
+  .kpi small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+  .meter{height:6px;border-radius:99px;background:var(--subtle);overflow:hidden;margin-top:10px;display:flex}
+  .meter i{display:block;height:100%}
+  .meter .ok{background:var(--ok)}.meter .warn{background:var(--warn)}.meter .bad{background:var(--bad)}.meter .na{background:var(--line-2)}
+  .grid-main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:16px;align-items:start}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+
+  /* Tabel */
+  .tw{overflow-x:auto}
+  table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.t th{text-align:left;font-size:12.5px;font-weight:600;color:var(--text-2);padding:11px 16px;border-bottom:1px solid var(--line);background:var(--subtle);white-space:nowrap}
+  table.t th.sort{cursor:pointer;user-select:none}
+  table.t th.sort:hover{color:var(--text)}
+  table.t th.sort .ar{opacity:.4;margin-left:3px}
+  table.t th.sort.on .ar{opacity:1;color:var(--primary)}
+  table.t td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.t tr:last-child td{border-bottom:0}
+  table.t .r{text-align:right}
+  table.t tr.click{cursor:pointer}
+  table.t tr.click:hover td{background:var(--hover)}
+  .cust b{display:block;font-weight:600}
+  .cust .none{color:var(--muted);font-weight:500;font-style:italic}
+  .cust small{display:block;font-size:12px;color:var(--muted)}
+  .labels{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .rx{font-variant-numeric:tabular-nums;font-weight:650}
+  .rx.good{color:var(--ok)}.rx.fair{color:var(--warn)}.rx.poor{color:var(--bad)}.rx.na{color:var(--muted);font-weight:500}
+  .dlt{font-size:11.5px;font-weight:600;margin-left:4px}
+  .dlt.down{color:var(--bad)}.dlt.up{color:var(--ok)}
+  .st{display:inline-flex;align-items:center;gap:6px;font-weight:550;font-size:13px;white-space:nowrap}
+  .st i{width:8px;height:8px;border-radius:50%}
+  .st.on i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}.st.off i{background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+  .st small{color:var(--muted);font-weight:500}
+  .toolbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .search{position:relative;flex:1 1 260px;max-width:380px}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+  .search input{padding-left:34px}
+  .toolbar select{width:auto;min-width:150px}
+  .seg{display:inline-flex;padding:3px;border-radius:var(--r-sm);background:var(--subtle);border:1px solid var(--line);gap:2px}
+  .seg button{border:0;background:none;height:28px;padding:0 11px;white-space:nowrap;border-radius:6px;font-size:12.5px;font-weight:550;color:var(--text-2)}
+  .seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+  .seg button .n{margin-left:5px;color:var(--muted);font-weight:500}
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+  .pager .pg{display:flex;gap:6px}
+
+  /* Daftar ringkas */
+  .list{list-style:none;margin:0;padding:0}
+  .list li{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--line)}
+  .list li:last-child{border-bottom:0}
+  .list li.click{cursor:pointer}.list li.click:hover{background:var(--hover)}
+  .list .grow{flex:1;min-width:0}
+  .list .grow b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list .grow small{display:block;color:var(--muted);font-size:12px}
+  .bars{padding:14px 20px 18px;display:grid;gap:12px}
+  .bar-r{display:grid;grid-template-columns:110px minmax(0,1fr) 46px;align-items:center;gap:10px;font-size:13px}
+  .bar-r span{color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar-r .meter{margin:0;height:8px}
+  .bar-r b{text-align:right;font-variant-numeric:tabular-nums}
+  .rt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:12px 20px;border-bottom:1px solid var(--line);cursor:pointer}
+  .rt-row:last-child{border-bottom:0}
+  .rt-row:hover{background:var(--hover)}
+  .rt-row b{font-weight:600}
+  .rt-row .meter{grid-column:1/-1;margin:0;height:6px}
+  .rt-row .rt-n{font-size:12.5px;color:var(--muted);text-align:right}
+
+  /* Detail ONT */
+  .dh{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .dh .av{width:52px;height:52px;border-radius:14px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex:none}
+  .dh .av svg{width:26px;height:26px}
+  .dh .tt{flex:1;min-width:0}
+  .dh h1{font-size:24px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .dh .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;color:var(--muted);font-size:13px}
+  .dh .meta span{display:inline-flex;align-items:center;gap:5px}
+  .dh .meta svg{width:14px;height:14px}
+  .dh .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .det{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat{padding:16px 20px;border-right:1px solid var(--line);min-width:0}
+  .stat:last-child{border-right:0}
+  .stat span{font-size:12.5px;color:var(--muted);font-weight:500}
+  .stat b{display:block;font-size:20px;font-weight:700;margin-top:4px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+  .chart-box{position:relative;height:260px;padding:12px 16px 16px}
+  .chart-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:13px;padding:20px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 20px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .kv:last-child{border-bottom:0}
+  .kv span{color:var(--muted);flex:none}
+  .kv b{font-weight:550;text-align:right;min-width:0;word-break:break-word}
+  .sec-t{padding:12px 20px 4px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .tag-in{display:flex;gap:8px;margin-top:8px}
+  .side-acts{padding:16px;display:grid;gap:8px}
+  .side-acts .btn{width:100%}
+
+  /* Modal & toast */
+  .mbg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:60;overflow-y:auto}
+  .modal{width:100%;max-width:480px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow-lg);animation:pop .16s ease}
+  .modal.md{max-width:560px}
+  .modal .mh{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 6px}
+  .modal .mh h2{font-size:17px;font-weight:650}
+  .modal .mb{padding:10px 22px 4px}
+  .modal .mf{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px 20px}
+  @keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--surface);padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:500;z-index:90;box-shadow:var(--shadow-lg);animation:pop .18s;max-width:90vw}
+  .toast.bad{background:var(--bad);color:#fff}
+
+  /* Login */
+  .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,var(--side),#1d4ed8)}
+  .login-box{width:100%;max-width:380px;background:var(--surface);border-radius:16px;padding:30px;box-shadow:var(--shadow-lg)}
+  .login-box .lb{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .login-box .lb span{width:42px;height:42px;border-radius:11px;background:var(--primary);color:#fff;display:grid;place-items:center}
+  .login-box h1{font-size:19px;font-weight:700}
+  .login-box p{color:var(--muted);font-size:13px}
+  .login-box .btn{width:100%;height:40px;margin-top:20px}
+
+  @media (max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.grid-main,.det{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+  @media (max-width:900px){
+    .side{transform:translateX(-100%)}body.nav-open .side{transform:none}
+    .main{margin-left:0}.menu-btn{display:grid}
+    .top{padding:0 14px}.content{padding:18px 14px}
+    .grid2{grid-template-columns:minmax(0,1fr)}
+    .hide-md{display:none}
+    .conn .chip-st span{display:none}
+  }
+  @media (max-width:600px){
+    .kpis{gap:10px}.kpi{padding:14px}.kpi b{font-size:23px}
+    .hide-sm{display:none}
+    .row2{grid-template-columns:1fr}
+    .ph h1{font-size:22px}
+    table.t th,table.t td{padding:10px 12px}
+    .dh .acts{width:100%}.dh .acts .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+<div id="loginView" class="login hidden">
+  <form class="login-box" id="loginForm">
+    <div class="lb"><span data-ic="wifi"></span><div><h1 id="lTitle">Panel ACS</h1><p id="lSub">Monitoring ONT dari GenieACS</p></div></div>
+    <label for="lu">Username</label>
+    <input id="lu" type="text" autocomplete="username" required>
+    <label for="lp">Password</label>
+    <input id="lp" type="password" autocomplete="current-password" required>
+    <label for="lp2" class="hidden" id="lp2L">Ulangi password</label>
+    <input id="lp2" type="password" class="hidden" autocomplete="new-password">
+    <div class="err" id="lErr"></div>
+    <button class="btn pri" id="lBtn">Masuk</button>
+  </form>
+</div>
+
+<div id="appView" class="hidden">
+  <aside class="side">
+    <div class="brand"><span class="brand-mark" data-ic="wifi"></span><div><b id="bName">Panel ACS</b><small>Monitoring ONT</small></div></div>
+    <button class="nav" data-go="#/"><span data-ic="home"></span>Dashboard</button>
+    <button class="nav" data-go="#/ont"><span data-ic="ont"></span>ONT<span class="cnt hidden" id="nCnt"></span></button>
+    <button class="nav" data-go="#/faults"><span data-ic="alert"></span>Faults<span class="cnt bad hidden" id="fCnt"></span></button>
+    <button class="nav" data-go="#/pengaturan"><span data-ic="gear"></span>Pengaturan</button>
+    <div class="grow"></div>
+    <button class="nav" data-act="theme"><span data-ic="moon"></span><span id="thTx">Mode gelap</span></button>
+    <button class="nav" data-act="logout"><span data-ic="logout"></span>Keluar</button>
+    <div class="side-foot"><span id="sUser"></span><span id="sVer"></span></div>
+  </aside>
+  <div class="backdrop" data-act="closenav"></div>
+  <div class="main">
+    <header class="top">
+      <button class="icon-btn menu-btn" data-act="opennav" aria-label="Menu"><span data-ic="menu"></span></button>
+      <div class="crumb" id="crumb"></div>
+      <div class="sp"></div>
+      <div class="conn" id="conn"></div>
+      <button class="icon-btn" data-act="refresh" title="Muat ulang data" aria-label="Muat ulang"><span data-ic="refresh"></span></button>
+    </header>
+    <main class="content" id="view"></main>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<script src="assets/chart.umd.js"></script>
+<script>
+"use strict";
+/* ================= Ikon ================= */
+const ICONS = {
+  wifi: '<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14.5 14.5 0 0 1 20 0"/><circle cx="12" cy="19.5" r="1"/>',
+  home: '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  ont: '<rect x="3" y="12" width="18" height="8" rx="2"/><path d="M7 16h.01M11 16h.01M8 8.5a6 6 0 0 1 8 0M5.5 6a10 10 0 0 1 13 0"/>',
+  alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  refresh: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  check: '<path d="M20 6L9 17l-5-5"/>',
+  x: '<path d="M18 6L6 18M6 6l12 12"/>',
+  signal: '<path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/>',
+  router: '<rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 16.5h.01M11 16.5h.01M8 9a6 6 0 0 1 8 0M5.5 6.5a10 10 0 0 1 13 0"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  power: '<path d="M18.4 6.6a9 9 0 1 1-12.8 0M12 2v10"/>',
+  edit: '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  tag: '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.5"/>',
+  trash: '<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  back: '<path d="M15 18l-6-6 6-6"/>',
+  chev: '<path d="M9 18l6-6-6-6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  chart: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M19 4l2 2"/>',
+};
+const ic = (n, cls) => `<svg class="i${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n] || ""}</svg>`;
+function paintIcons(root) { (root || document).querySelectorAll("[data-ic]").forEach((el) => { el.innerHTML = ic(el.dataset.ic); el.removeAttribute("data-ic"); }); }
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const nf = (n) => Number(n || 0).toLocaleString("id-ID");
+
+/* ================= Utilitas ================= */
+async function api(path, opts = {}) {
+  const o = { method: opts.method || "GET", headers: {}, credentials: "same-origin", cache: "no-store" };
+  if (o.method !== "GET") { o.headers["Content-Type"] = "application/json"; o.headers["X-Req"] = "1"; o.body = JSON.stringify(opts.body || {}); }
+  const r = await fetch("api/" + path, o);
+  let d = {};
+  try { d = await r.json(); } catch (e) {}
+  if (r.status === 401 && !/^(login|setup|me)/.test(path)) { showLogin(); throw new Error(d.error || "Sesi berakhir"); }
+  if (!r.ok) throw new Error(d.error || "Terjadi kesalahan (" + r.status + ")");
+  return d;
+}
+function toast(msg, bad) { document.querySelectorAll(".toast").forEach((t) => t.remove()); const t = document.createElement("div"); t.className = "toast" + (bad ? " bad" : ""); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+function busy(btn, on) { if (btn) { btn.classList.toggle("busy", on); btn.disabled = on; } }
+function modal(title, body, foot, size) {
+  $("#modalRoot").innerHTML = `<div class="mbg" id="mbg"><div class="modal ${size || ""}" role="dialog" aria-modal="true"><div class="mh"><h2>${title}</h2><button class="icon-btn" data-act="close" aria-label="Tutup">${ic("x")}</button></div><div class="mb">${body}</div><div class="mf">${foot}</div></div></div>`;
+  $("#mbg").addEventListener("mousedown", (e) => { if (e.target.id === "mbg") closeModal(); });
+  const f = $("#modalRoot input:not([type=hidden]),#modalRoot select"); if (f) setTimeout(() => f.focus(), 30);
+}
+function closeModal() { $("#modalRoot").innerHTML = ""; }
+function confirmBox(title, text, ok, danger, onOk) {
+  modal(title, `<p style="color:var(--text-2);line-height:1.6">${text}</p><div class="err" id="cErr"></div>`, `<button class="btn" data-act="close">Batal</button><button class="btn ${danger ? "danger" : "pri"}" id="cOk">${ok}</button>`);
+  $("#cOk").onclick = async () => { busy($("#cOk"), true); try { await onOk(); } catch (e) { $("#cErr").textContent = e.message; busy($("#cOk"), false); } };
+}
+const now = () => Math.floor(Date.now() / 1000);
+function dur(s) { s = Math.max(0, s | 0); if (s < 60) return s + " dtk"; if (s < 3600) return Math.floor(s / 60) + " mnt"; if (s < 86400) return Math.floor(s / 3600) + " j " + Math.floor((s % 3600) / 60) + " m"; return Math.floor(s / 86400) + " h " + Math.floor((s % 86400) / 3600) + " j"; }
+const ago = (t) => (t ? dur(now() - t) + " lalu" : "—");
+function fmtT(t) { if (!t) return "—"; return new Date(t * 1000).toLocaleString("id-ID", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }); }
+const rxTxt = (rx) => (rx === null || rx === undefined ? "—" : rx.toFixed(2).replace(".", ",") + " dBm");
+const RXC = { good: "Baik", fair: "Cukup", poor: "Buruk", na: "Tidak ada" };
+const stHtml = (d) => d.online ? `<span class="st on"><i></i>Online${d.boot ? ` <small>· ${dur(now() - d.boot)}</small>` : ""}</span>` : `<span class="st off"><i></i>Offline${d.last ? ` <small>· ${dur(now() - d.last)}</small>` : ""}</span>`;
+const custHtml = (d) => `<div class="cust">${d.name ? `<b>${esc(d.name)}</b>` : `<b class="none">Tanpa nama</b>`}<small class="mono">${esc(d.serial)}${d.pc && d.pc !== "-" ? " · " + esc(d.pc) : ""}</small>${d.labels.length ? `<div class="labels">${d.labels.slice(0, 3).map((t) => `<span class="tag">${esc(t.replace(/_/g, " "))}</span>`).join("")}${d.labels.length > 3 ? `<span class="tag">+${d.labels.length - 3}</span>` : ""}</div>` : ""}</div>`;
+function deltaHtml(id) { const v = DATA && DATA.delta ? DATA.delta[id] : null; if (v === null || v === undefined || Math.abs(v) < 0.5) return ""; return `<span class="dlt ${v < 0 ? "down" : "up"}" title="Perubahan 24 jam">${v > 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(1).replace(".", ",")}</span>`; }
+
+/* ================= State ================= */
+let ME = null, DATA = null, STATUS = null;
+async function loadData(force) {
+  DATA = await api("devices" + (force ? "?refresh=1" : ""));
+  const n = DATA.devices.length, off = DATA.devices.filter((d) => !d.online).length;
+  $("#nCnt").textContent = nf(n); $("#nCnt").classList.toggle("hidden", !n);
+  $("#fCnt").textContent = nf(DATA.faults); $("#fCnt").classList.toggle("hidden", !DATA.faults);
+  return DATA;
+}
+async function loadStatus(force) {
+  try { STATUS = await api("status" + (force ? "?refresh=1" : "")); } catch (e) { return; }
+  const N = STATUS.nbi, P = STATUS.panel;
+  $("#conn").innerHTML = `<span class="chip-st ${N.ok ? "ok" : "bad"}" title="${esc(N.ok ? "GenieACS NBI terhubung" : N.error)}"><i></i><span>GenieACS ${N.ok ? "terhubung" : "terputus"}</span></span>`
+    + (P.linked ? `<span class="chip-st ${P.ok && !P.error ? "ok" : P.ok ? "warn" : "bad"}" title="${esc(P.error || `${P.routers} router dari panel utama`)}"><i></i><span>Panel utama ${P.ok && !P.error ? "terhubung" : P.ok ? "data lama" : "terputus"}</span></span>` : "");
+}
+
+/* ================= Router ================= */
+function crumb(items) { $("#crumb").innerHTML = items.map((x, i) => i < items.length - 1 ? `<a href="${x[1]}">${esc(x[0])}</a><span>/</span>` : `<b>${esc(x[0])}</b>`).join(""); }
+let CHART = null;
+async function route() {
+  const h = (location.hash || "#/").split("?")[0];
+  const parts = h.replace(/^#\/?/, "").split("/").filter(Boolean);
+  document.querySelectorAll(".nav[data-go]").forEach((n) => { const g = n.dataset.go.replace(/^#\/?/, ""); n.classList.toggle("on", (g === "" && !parts.length) || (g && parts[0] === g)); });
+  document.body.classList.remove("nav-open");
+  closeModal();
+  if (CHART) { CHART.destroy(); CHART = null; }
+  const v = $("#view");
+  if (parts[0] === "ont" && parts[1]) return viewDevice(v, decodeURIComponent(parts.slice(1).join("/")));
+  if (parts[0] === "ont") return viewList(v);
+  if (parts[0] === "faults") return viewFaults(v);
+  if (parts[0] === "pengaturan") return viewSettings(v);
+  return viewDashboard(v);
+}
+window.addEventListener("hashchange", route);
+const loading = (v) => { if (!v.innerHTML.trim()) v.innerHTML = `<div class="card"><div class="empty"><span class="spin"></span><p style="margin-top:10px">Membaca data GenieACS…</p></div></div>`; };
+const errNote = (e) => `<div class="note bad">${ic("alert")}<div><b>Gagal membaca GenieACS</b>${esc(e)} — cek alamat NBI di <a href="#/pengaturan">Pengaturan</a>.</div></div>`;
+
+/* ================= Dashboard ================= */
+async function viewDashboard(v) {
+  crumb([["Dashboard"]]);
+  loading(v);
+  try { await loadData(); } catch (e) { v.innerHTML = errNote(e.message); return; }
+  if (!location.hash.match(/^#?\/?$/) && location.hash !== "#/") return;
+  const D = DATA.devices, n = D.length, on = D.filter((d) => d.online).length, off = n - on;
+  const cls = { good: 0, fair: 0, poor: 0, na: 0 }; D.forEach((d) => cls[d.rxc]++);
+  const pct = (x) => (n ? Math.round((x / n) * 100) : 0);
+  const drop = DATA.thresholds.drop;
+  const worse = D.filter((d) => DATA.delta[d.id] !== undefined && DATA.delta[d.id] <= -drop).sort((a, b) => DATA.delta[a.id] - DATA.delta[b.id]);
+  const att = D.filter((d) => !d.online || d.rxc === "poor").sort((a, b) => Number(a.online) - Number(b.online) || (a.rx ?? 0) - (b.rx ?? 0));
+  const fresh = D.filter((d) => d.registered && now() - d.registered < 7 * 86400).sort((a, b) => b.registered - a.registered);
+  // Per router (dari panel utama)
+  const byR = new Map();
+  for (const d of D) { const k = d.router || ""; if (!byR.has(k)) byR.set(k, { name: d.router, id: d.routerId, on: 0, n: 0, rOn: d.routerOn, tr: d.routerTr }); const x = byR.get(k); x.n++; if (d.online) x.on++; }
+  const routers = [...byR.values()].sort((a, b) => (a.name ? 0 : 1) - (b.name ? 0 : 1) || b.n - a.n);
+  const brands = {}; D.forEach((d) => (brands[d.brand] = (brands[d.brand] || 0) + 1));
+  const br = Object.entries(brands).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const P = DATA.panel;
+  v.innerHTML = `
+    <div class="ph"><div><h1>Dashboard</h1><p>Ringkasan ONT dari GenieACS${P.linked ? ", dikelompokkan per router panel utama" : ""}.</p></div>
+      <div class="acts"><a class="btn" href="#/ont">${ic("ont")}Semua ONT</a></div></div>
+    ${DATA.error ? errNote(DATA.error) : ""}
+    ${P.linked && !P.ok ? `<div class="note warn">${ic("alert")}<div><b>Router panel utama belum terbaca</b>${esc(P.error)}. ONT belum bisa dikelompokkan per router.</div></div>` : ""}
+    <div class="kpis">
+      <a class="kpi" href="#/ont"><div class="kh"><span class="ki info">${ic("ont")}</span>Total ONT</div><b>${nf(n)}</b><small>${fresh.length ? `${fresh.length} baru dalam 7 hari` : "terdaftar di GenieACS"}</small></a>
+      <a class="kpi" href="#/ont?st=on"><div class="kh"><span class="ki ok">${ic("check")}</span>Online</div><b>${nf(on)}</b><div class="meter"><i class="ok" style="width:${pct(on)}%"></i></div><small>${pct(on)}% dari semua ONT</small></a>
+      <a class="kpi" href="#/ont?st=off"><div class="kh"><span class="ki bad">${ic("power")}</span>Offline</div><b>${nf(off)}</b><div class="meter"><i class="bad" style="width:${pct(off)}%"></i></div><small>${off ? "tidak melapor ke GenieACS" : "semua melapor"}</small></a>
+      <a class="kpi" href="#/ont?rx=poor"><div class="kh"><span class="ki warn">${ic("signal")}</span>Redaman buruk</div><b>${nf(cls.poor)}</b><div class="meter"><i class="warn" style="width:${pct(cls.poor)}%"></i></div><small>di bawah ${DATA.thresholds.fair} dBm</small></a>
+    </div>
+    <div class="grid-main">
+      <div class="stack">
+        <div class="card"><div class="ch"><h2>Perlu perhatian</h2><span class="sub">${nf(att.length)} ONT offline atau redaman buruk</span></div>
+          ${att.length ? `<div class="tw"><table class="t"><thead><tr><th>Pelanggan</th><th class="hide-sm">Router</th><th>Redaman</th><th>Status</th></tr></thead><tbody>
+            ${att.slice(0, 8).map((d) => `<tr class="click" data-go="#/ont/${encodeURIComponent(d.id)}"><td>${custHtml(d)}</td><td class="hide-sm">${esc(d.router || "—")}</td><td><span class="rx ${d.rxc}">${rxTxt(d.rx)}</span></td><td>${stHtml(d)}</td></tr>`).join("")}
+          </tbody></table></div>${att.length > 8 ? `<div class="pager"><span>Menampilkan 8 dari ${nf(att.length)}</span><a class="btn sm" href="#/ont?st=att">Lihat semua</a></div>` : ""}`
+          : `<div class="empty"><div class="big">${ic("check")}</div><h3>Semua normal</h3><p>Semua ONT online dengan redaman baik.</p></div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Redaman memburuk (24 jam)</h2><span class="sub">turun ≥ ${String(drop).replace(".", ",")} dB</span></div>
+          ${worse.length ? `<div class="tw"><table class="t"><thead><tr><th>Pelanggan</th><th class="hide-sm">Router</th><th>Sekarang</th><th class="r">Perubahan</th></tr></thead><tbody>
+            ${worse.slice(0, 8).map((d) => `<tr class="click" data-go="#/ont/${encodeURIComponent(d.id)}"><td>${custHtml(d)}</td><td class="hide-sm">${esc(d.router || "—")}</td><td><span class="rx ${d.rxc}">${rxTxt(d.rx)}</span></td><td class="r"><span class="rx poor">${DATA.delta[d.id].toFixed(1).replace(".", ",")} dB</span></td></tr>`).join("")}
+          </tbody></table></div>` : `<div class="empty" style="padding:26px 20px"><p>Tidak ada ONT yang redamannya memburuk. Butuh history redaman (aktif di Pengaturan).</p></div>`}
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card"><div class="ch"><h2>Status per router</h2><span class="sub">${P.linked ? "dari panel utama" : "panel utama belum terhubung"}</span></div>
+          ${routers.map((r) => `<div class="rt-row" data-go="#/ont?r=${encodeURIComponent(r.name || "-")}"><div><b>${esc(r.name || "Tanpa router")}</b>${r.name ? ` <span class="tag">${esc({ zt: "ZeroTier", wg: "WireGuard" }[r.tr] || "L2TP")}</span>${r.rOn === false ? ` <span class="pill bad">router putus</span>` : ""}` : ` <span class="muted small">IP di luar IP virtual router</span>`}</div><div class="rt-n"><b style="color:var(--text)">${r.on}</b> / ${r.n} online</div><div class="meter"><i class="ok" style="width:${r.n ? (r.on / r.n) * 100 : 0}%"></i><i class="bad" style="width:${r.n ? ((r.n - r.on) / r.n) * 100 : 0}%"></i></div></div>`).join("") || `<div class="empty"><p>Belum ada ONT.</p></div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Kualitas redaman</h2><span class="sub">${nf(n)} ONT</span></div>
+          <div class="bars">${[["good", "Baik", "ok"], ["fair", "Cukup", "warn"], ["poor", "Buruk", "bad"], ["na", "Tidak ada data", "na"]].map(([k, l, c]) => `<div class="bar-r"><span>${l}</span><div class="meter"><i class="${c}" style="width:${pct(cls[k])}%"></i></div><b>${nf(cls[k])}</b></div>`).join("")}</div>
+        </div>
+        <div class="card"><div class="ch"><h2>Merek ONT</h2><span class="sub">${Object.keys(brands).length} merek</span></div>
+          <div class="bars">${br.map(([b, c]) => `<div class="bar-r"><span>${esc(b)}</span><div class="meter"><i class="ok" style="width:${pct(c)}%;background:var(--primary)"></i></div><b>${nf(c)}</b></div>`).join("")}</div>
+        </div>
+      </div>
+    </div>`;
+  paintIcons(v);
+}
+
+/* ================= Daftar ONT ================= */
+const LIST = { q: "", st: "all", rx: "all", r: "", sort: "name", dir: 1, page: 1 };
+async function viewList(v) {
+  crumb([["Dashboard", "#/"], ["ONT"]]);
+  const qp = new URLSearchParams((location.hash.split("?")[1]) || "");
+  if (qp.has("st")) LIST.st = qp.get("st"); if (qp.has("rx")) LIST.rx = qp.get("rx"); if (qp.has("r")) LIST.r = qp.get("r");
+  if (qp.toString()) history.replaceState(null, "", "#/ont");
+  loading(v);
+  try { await loadData(); } catch (e) { v.innerHTML = errNote(e.message); return; }
+  if (!location.hash.startsWith("#/ont")) return;
+  const D = DATA.devices;
+  const routers = [...new Set(D.map((d) => d.router || "-"))].sort((a, b) => (a === "-") - (b === "-") || a.localeCompare(b, "id"));
+  const cnt = { all: D.length, on: D.filter((d) => d.online).length, off: D.filter((d) => !d.online).length, att: D.filter((d) => !d.online || d.rxc === "poor").length };
+  v.innerHTML = `
+    <div class="ph"><div><h1>ONT</h1><p>Semua ONT di GenieACS. Klik baris untuk detail, redaman, WiFi, dan nama pelanggan.</p></div>
+      <div class="acts"><button class="btn" id="csvBtn">Unduh CSV</button></div></div>
+    ${DATA.error ? errNote(DATA.error) : ""}
+    <div class="card">
+      <div class="ch"><h2>Daftar ONT</h2><span class="sub" id="lCount"></span></div>
+      <div class="toolbar">
+        <div class="search">${ic("search")}<input type="search" id="lq" placeholder="Cari nama, label, SN, PPPoE, IP, SSID" value="${esc(LIST.q)}"></div>
+        <div class="seg" id="lSt">${[["all", "Semua"], ["on", "Online"], ["off", "Offline"], ["att", "Perlu perhatian"]].map(([k, l]) => `<button data-st="${k}" class="${LIST.st === k ? "on" : ""}">${l}<span class="n">${nf(cnt[k])}</span></button>`).join("")}</div>
+        <select id="lRx" aria-label="Redaman"><option value="all">Semua redaman</option>${[["good", "Baik"], ["fair", "Cukup"], ["poor", "Buruk"], ["na", "Tidak ada data"]].map(([k, l]) => `<option value="${k}" ${LIST.rx === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+        <select id="lR" aria-label="Router"><option value="">Semua router</option>${routers.map((r) => `<option value="${esc(r)}" ${LIST.r === r ? "selected" : ""}>${r === "-" ? "Tanpa router" : esc(r)}</option>`).join("")}</select>
+      </div>
+      <div class="tw"><table class="t"><thead><tr>
+        ${[["name", "Pelanggan"], ["router", "Router", "hide-sm"], ["rx", "Redaman"], ["clients", "Klien", "hide-md"], ["pppoe", "PPPoE / SSID", "hide-md"], ["online", "Status"], ["last", "Lapor", "hide-sm"]].map(([k, l, c]) => `<th class="sort ${c || ""} ${LIST.sort === k ? "on" : ""}" data-sort="${k}">${l}<span class="ar">${LIST.sort === k ? (LIST.dir > 0 ? "↑" : "↓") : "↕"}</span></th>`).join("")}
+      </tr></thead><tbody id="lRows"></tbody></table></div>
+      <div class="pager" id="lPager"></div>
+    </div>`;
+  paintIcons(v);
+  let tm;
+  $("#lq").addEventListener("input", (e) => { LIST.q = e.target.value; LIST.page = 1; clearTimeout(tm); tm = setTimeout(fillList, 150); });
+  $("#lSt").onclick = (e) => { const b = e.target.closest("[data-st]"); if (!b) return; LIST.st = b.dataset.st; LIST.page = 1; $("#lSt").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); fillList(); };
+  $("#lRx").onchange = (e) => { LIST.rx = e.target.value; LIST.page = 1; fillList(); };
+  $("#lR").onchange = (e) => { LIST.r = e.target.value; LIST.page = 1; fillList(); };
+  v.querySelectorAll("th[data-sort]").forEach((th) => (th.onclick = () => { const k = th.dataset.sort; LIST.dir = LIST.sort === k ? -LIST.dir : 1; LIST.sort = k; viewList(v); }));
+  $("#csvBtn").onclick = () => {
+    const rows = [["Nama", "Label", "Serial", "Model", "Merek", "Router", "Redaman dBm", "Status", "Lapor terakhir", "PPPoE", "IP TR-069", "SSID", "Klien"]].concat(filtered().map((d) => [d.name, d.labels.join(" "), d.serial, d.pc, d.brand, d.router, d.rx ?? "", d.online ? "Online" : "Offline", fmtT(d.last), d.pppoe, d.ip, d.ssid, d.clients ?? ""]));
+    const csv = rows.map((r) => r.map((x) => `"${String(x ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" })); a.download = "ont.csv"; a.click();
+  };
+  fillList();
+}
+function filtered() {
+  const q = LIST.q.trim().toLowerCase();
+  return DATA.devices.filter((d) => {
+    if (LIST.st === "on" && !d.online) return false;
+    if (LIST.st === "off" && d.online) return false;
+    if (LIST.st === "att" && d.online && d.rxc !== "poor") return false;
+    if (LIST.rx !== "all" && d.rxc !== LIST.rx) return false;
+    if (LIST.r && (d.router || "-") !== LIST.r) return false;
+    if (!q) return true;
+    return [d.name, d.labels.join(" "), d.serial, d.pc, d.pppoe, d.ip, d.ipWan, d.ssid, d.ssid5, d.mac, d.router, d.brand].join(" ").toLowerCase().includes(q);
+  }).sort((a, b) => {
+    const k = LIST.sort, x = a[k], y = b[k];
+    if (k === "name") return LIST.dir * String(a.name || "~" + a.serial).localeCompare(String(b.name || "~" + b.serial), "id");
+    if (x === y) return 0; if (x === null || x === undefined || x === "") return 1; if (y === null || y === undefined || y === "") return -1;
+    return LIST.dir * (typeof x === "number" || typeof x === "boolean" ? Number(x) - Number(y) : String(x).localeCompare(String(y), "id"));
+  });
+}
+function fillList() {
+  const all = filtered(), per = 50, pages = Math.max(1, Math.ceil(all.length / per));
+  LIST.page = Math.min(LIST.page, pages);
+  const rows = all.slice((LIST.page - 1) * per, LIST.page * per);
+  $("#lCount").textContent = `${nf(all.length)} ONT`;
+  $("#lRows").innerHTML = rows.map((d) => `<tr class="click" data-go="#/ont/${encodeURIComponent(d.id)}">
+    <td>${custHtml(d)}</td>
+    <td class="hide-sm">${d.router ? esc(d.router) : `<span class="muted">—</span>`}</td>
+    <td><span class="rx ${d.rxc}">${rxTxt(d.rx)}</span>${deltaHtml(d.id)}</td>
+    <td class="hide-md">${d.clients ?? "—"}</td>
+    <td class="hide-md"><div class="mono small">${esc(d.pppoe || "—")}</div><div class="muted small">${esc(d.ssid || d.ssid5 || "")}</div></td>
+    <td>${stHtml(d)}</td>
+    <td class="hide-sm muted small">${ago(d.last)}</td></tr>`).join("") || `<tr><td colspan="7"><div class="empty"><p>Tidak ada ONT yang cocok.</p></div></td></tr>`;
+  $("#lPager").innerHTML = `<span>${all.length ? `${(LIST.page - 1) * per + 1}–${Math.min(LIST.page * per, all.length)} dari ${nf(all.length)}` : ""}</span><div class="pg"><button class="btn sm" id="pPrev" ${LIST.page <= 1 ? "disabled" : ""}>${ic("back")}Sebelumnya</button><button class="btn sm" id="pNext" ${LIST.page >= pages ? "disabled" : ""}>Berikutnya${ic("chev")}</button></div>`;
+  $("#pPrev").onclick = () => { LIST.page--; fillList(); window.scrollTo(0, 0); };
+  $("#pNext").onclick = () => { LIST.page++; fillList(); window.scrollTo(0, 0); };
+}
+
+/* ================= Detail ONT ================= */
+let DEV = null, RANGE = "7d";
+async function viewDevice(v, id) {
+  crumb([["Dashboard", "#/"], ["ONT", "#/ont"], ["…"]]);
+  v.innerHTML = "";
+  loading(v);
+  try { DEV = await api("device?id=" + encodeURIComponent(id)); } catch (e) { v.innerHTML = `<div class="note bad">${ic("alert")}<div><b>ONT tidak terbaca</b>${esc(e.message)}</div></div><a class="btn" href="#/ont">${ic("back")}Kembali ke daftar</a>`; paintIcons(v); return; }
+  const d = DEV;
+  crumb([["Dashboard", "#/"], ["ONT", "#/ont"], [d.name || d.serial]]);
+  const R = d.routerInfo;
+  const kv = (rows) => rows.filter((r) => r).map(([k, val, raw]) => `<div class="kv"><span>${k}</span><b${raw ? "" : ""}>${raw ? val : esc(val === null || val === undefined || val === "" ? "—" : val)}</b></div>`).join("");
+  v.innerHTML = `
+    <div class="dh">
+      <span class="av">${ic("ont")}</span>
+      <div class="tt"><h1>${d.name ? esc(d.name) : `<span class="muted" style="font-weight:600">Tanpa nama</span>`} ${d.online ? `<span class="pill ok">Online</span>` : `<span class="pill bad">Offline</span>`}</h1>
+        <div class="meta"><span class="mono">${esc(d.serial)}</span><span>${esc(d.brand)} ${esc(d.pc)}</span>${R ? `<span>${ic("router")}${esc(R.name)}</span>` : ""}<span>${ic("clock")}Lapor ${ago(d.last)}</span></div>
+        ${d.labels.length ? `<div class="labels" style="margin-top:8px">${d.labels.map((t) => `<span class="tag">${esc(t.replace(/_/g, " "))}</span>`).join("")}</div>` : ""}</div>
+      <div class="acts"><button class="btn" id="aRefresh">${ic("refresh")}Baca ulang</button><button class="btn danger" id="aReboot">${ic("power")}Reboot</button></div>
+    </div>
+    ${!d.online ? `<div class="note warn">${ic("alert")}<div><b>ONT tidak melapor ${d.last ? "sejak " + ago(d.last) : ""}</b>${d.informIv ? `Interval inform ${d.informIv >= 3600 ? d.informIv / 3600 + " jam" : Math.round(d.informIv / 60) + " menit"}. ` : ""}${R && R.online === false ? `Router <b style="display:inline">${esc(R.name)}</b> di panel utama sedang terputus.` : "Jika ONT tetap hidup di lokasi, kemungkinan inform berkalanya jarang/mati: perbaiki dari panel utama → GenieACS → Inform berkala ONT."}</div></div>` : ""}
+    <div class="det">
+      <div class="stack">
+        <div class="card"><div class="stats">
+          <div class="stat"><span>Redaman (RX)</span><b class="rx ${d.rxc}">${rxTxt(d.rx)}</b><small>${RXC[d.rxc]}${d.delta !== null && Math.abs(d.delta) >= 0.1 ? ` · ${d.delta > 0 ? "+" : ""}${d.delta.toFixed(1).replace(".", ",")} dB 24 jam` : ""}</small></div>
+          <div class="stat"><span>Suhu</span><b>${d.temp !== null && d.temp !== "" ? esc(d.temp) + " °C" : "—"}</b><small>transceiver</small></div>
+          <div class="stat"><span>Klien WiFi</span><b>${d.clients ?? "—"}</b><small>${esc(d.ssid || d.ssid5 || "—")}</small></div>
+          <div class="stat"><span>${d.online ? "Menyala" : "Terakhir lapor"}</span><b>${d.online ? (d.boot ? dur(now() - d.boot) : "—") : ago(d.last)}</b><small>${d.online && d.boot ? "sejak " + fmtT(d.boot) : fmtT(d.last)}</small></div>
+        </div></div>
+        <div class="card"><div class="ch"><h2>History redaman</h2><div class="seg" id="rxR">${[["1d", "24 jam"], ["7d", "7 hari"], ["30d", "30 hari"], ["90d", "90 hari"]].map(([k, l]) => `<button data-r="${k}" class="${RANGE === k ? "on" : ""}">${l}</button>`).join("")}</div></div>
+          <div class="chart-box"><canvas id="rxC"></canvas><div class="chart-empty hidden" id="rxE"></div></div>
+          <div class="pager" id="rxS" style="border-top:1px solid var(--line)"></div>
+        </div>
+        <div class="card"><div class="ch"><h2>Jaringan WiFi</h2><span class="sub">${d.wlans.filter((w) => w.ssid).length} SSID</span></div>
+          ${d.wlans.length ? `<div class="tw"><table class="t"><thead><tr><th>SSID</th><th>Band</th><th class="hide-sm">Channel</th><th class="hide-md">Keamanan</th><th>Klien</th><th>Status</th><th class="r"></th></tr></thead><tbody>
+            ${d.wlans.map((w) => `<tr><td><b style="font-weight:600">${esc(w.ssid || "—")}</b><div class="muted small">#${esc(w.idx)}${w.hidden ? " · tersembunyi" : ""}</div></td><td>${w.band} GHz</td><td class="hide-sm">${esc(w.channel ?? "—")}</td><td class="hide-md">${esc(w.sec || "—")}</td><td>${w.clients ?? "—"}</td><td>${w.enable === false || w.enable === "false" || w.enable === 0 || w.enable === "0" ? `<span class="pill gray">Mati</span>` : `<span class="pill ok">Aktif</span>`}</td><td class="r"><button class="btn sm" data-wifi="${esc(w.idx)}" data-ssid="${esc(w.ssid)}">${ic("edit")}Ubah</button></td></tr>`).join("")}
+          </tbody></table></div>` : `<div class="empty" style="padding:24px"><p>Data WiFi belum dibaca GenieACS. Klik Baca ulang.</p></div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Koneksi WAN</h2><span class="sub">${d.wans.length}</span></div>
+          ${d.wans.length ? `<div class="tw"><table class="t"><thead><tr><th>Nama</th><th>Tipe</th><th class="hide-sm">VLAN</th><th>IP / PPPoE</th><th>Status</th></tr></thead><tbody>
+            ${d.wans.map((w) => `<tr><td><b style="font-weight:600">${esc(w.name)}</b></td><td>${esc(w.proto)}${w.mode ? ` <span class="tag">${esc(w.mode)}</span>` : ""}</td><td class="hide-sm">${esc(w.vlan ?? "—")}</td><td><div class="mono small">${esc(w.ip || "—")}</div>${w.user ? `<div class="muted small mono">${esc(w.user)}</div>` : ""}</td><td>${w.status ? `<span class="pill ${/^connected$/i.test(w.status) ? "ok" : /connecting|unconfigured/i.test(w.status) ? "warn" : "gray"}">${esc(w.status)}</span>` : "—"}${w.uptime ? `<div class="muted small">${dur(w.uptime)}</div>` : ""}</td></tr>`).join("")}
+          </tbody></table></div>` : `<div class="empty" style="padding:24px"><p>Data WAN belum dibaca.</p></div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Perangkat terhubung</h2><span class="sub">${d.hosts.length}</span></div>
+          ${d.hosts.length ? `<div class="tw"><table class="t"><thead><tr><th>Nama</th><th>IP</th><th class="hide-sm">MAC</th><th class="hide-md">Antarmuka</th></tr></thead><tbody>
+            ${d.hosts.map((h) => `<tr><td>${esc(h.name || "—")}${h.active === false || h.active === "false" || h.active === 0 ? ` <span class="pill gray">tidak aktif</span>` : ""}</td><td class="mono small">${esc(h.ip || "—")}</td><td class="hide-sm mono small">${esc(h.mac || "—")}</td><td class="hide-md muted small">${esc(h.iface || "—")}</td></tr>`).join("")}
+          </tbody></table></div>` : `<div class="empty" style="padding:24px"><p>Belum ada data perangkat terhubung.</p></div>`}
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card"><div class="ch"><h2>Pelanggan &amp; label</h2><button class="btn sm" id="tagEdit">${ic("edit")}Ubah</button></div>
+          ${kv([["Nama pelanggan", d.name || "—"], ["Label", d.labels.length ? d.labels.map((t) => `<span class="tag">${esc(t.replace(/_/g, " "))}</span>`).join(" ") : "—", true]])}
+          ${d.legacyTags ? `<div class="help" style="padding:0 20px 14px">Tag lama terdeteksi. Simpan sekali agar nama memakai tag <span class="mono">nama:</span>.</div>` : ""}
+        </div>
+        <div class="card"><div class="ch"><h2>Router panel utama</h2>${R ? (R.online ? `<span class="pill ok">Tersambung</span>` : `<span class="pill bad">Terputus</span>`) : ""}</div>
+          ${R ? kv([["Router", R.name], ["Jalur VPN", { zt: "ZeroTier", wg: "WireGuard" }[R.transport] || "L2TP"], ["IP virtual", R.virtualSubnet], ["IP TR-069 ONT", d.ip]])
+            : `<div class="cb muted small">${d.panelLinked ? `IP TR-069 <span class="mono">${esc(d.ip || "—")}</span> tidak termasuk IP virtual router mana pun di panel utama.` : "Panel utama belum terhubung."}</div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Perangkat</h2></div>
+          ${kv([["Serial", d.serial], ["Model", d.pc], ["Merek", d.brand], ["Firmware", d.sw], ["Hardware", d.hw], ["MAC", d.mac], ["Mode PON", d.ponMode], ["PPPoE", d.pppoe], ["IP WAN", d.ipWan], ["Interval inform", d.informIv ? (d.informIv >= 3600 ? d.informIv / 3600 + " jam" : Math.round(d.informIv / 60) + " menit") : "—"], ["Terdaftar", fmtT(d.registered)], ["ID GenieACS", d.id]])}
+        </div>
+      </div>
+    </div>`;
+  paintIcons(v);
+  $("#aRefresh").onclick = async () => { const b = $("#aRefresh"); busy(b, true); try { const r = await api("device/action", { method: "POST", body: { id: d.id, action: "refresh", tr181: d.tr181 } }); toast(r.msg); if (!r.queued) setTimeout(() => viewDevice(v, d.id), 800); } catch (e) { toast(e.message, true); } busy(b, false); };
+  $("#aReboot").onclick = () => confirmBox("Reboot ONT?", `ONT <b>${esc(d.name || d.serial)}</b> akan restart dan pelanggan terputus sekitar 1–2 menit.`, "Reboot", true, async () => { const r = await api("device/action", { method: "POST", body: { id: d.id, action: "reboot" } }); closeModal(); toast(r.msg); });
+  v.querySelectorAll("[data-wifi]").forEach((b) => (b.onclick = () => wifiDialog(d, b.dataset.wifi, b.dataset.ssid)));
+  $("#tagEdit").onclick = () => tagDialog(d);
+  $("#rxR").onclick = (e) => { const b = e.target.closest("[data-r]"); if (!b) return; RANGE = b.dataset.r; $("#rxR").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); drawRx(d.id); };
+  drawRx(d.id);
+}
+async function drawRx(id) {
+  let s;
+  try { s = await api(`rx?id=${encodeURIComponent(id)}&range=${RANGE}`); } catch (e) { return; }
+  if (!$("#rxC")) return;
+  const empty = $("#rxE");
+  if (CHART) { CHART.destroy(); CHART = null; }
+  if (!s.points.length) { empty.classList.remove("hidden"); empty.innerHTML = `<div>Belum ada history redaman untuk rentang ini.<br><span class="small">Aktifkan di <a href="#/pengaturan">Pengaturan → History redaman</a>.</span></div>`; $("#rxS").innerHTML = ""; return; }
+  empty.classList.add("hidden");
+  const cs = getComputedStyle(document.body);
+  const col = cs.getPropertyValue("--primary").trim(), grid = cs.getPropertyValue("--line").trim(), mut = cs.getPropertyValue("--muted").trim();
+  const ctx = $("#rxC").getContext("2d");
+  const grad = ctx.createLinearGradient(0, 0, 0, 240); grad.addColorStop(0, col + "33"); grad.addColorStop(1, col + "00");
+  const fmtX = (t) => new Date(t * 1000).toLocaleString("id-ID", RANGE === "1d" ? { hour: "2-digit", minute: "2-digit" } : { day: "2-digit", month: "short" });
+  CHART = new Chart(ctx, {
+    type: "line",
+    data: { labels: s.points.map((p) => fmtX(p.t)), datasets: [{ data: s.points.map((p) => p.rx), borderColor: col, backgroundColor: grad, fill: "start", borderWidth: 2, pointRadius: s.points.length > 60 ? 0 : 2, tension: 0.25 }] },
+    options: { maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { callbacks: { title: (it) => fmtT(s.points[it[0].dataIndex].t), label: (it) => " " + rxTxt(it.parsed.y) } } },
+      scales: { x: { grid: { display: false }, ticks: { color: mut, maxTicksLimit: innerWidth < 600 ? 4 : 8, maxRotation: 0 } }, y: { grid: { color: grid }, ticks: { color: mut, callback: (v) => v + " dBm" } } } },
+  });
+  const st = s.stats;
+  $("#rxS").innerHTML = `<span>Terendah <b style="color:var(--text)">${rxTxt(st.min)}</b> · Rata-rata <b style="color:var(--text)">${rxTxt(st.avg)}</b> · Tertinggi <b style="color:var(--text)">${rxTxt(st.max)}</b></span><span>${nf(st.n)} titik</span>`;
+}
+function wifiDialog(d, idx, ssid) {
+  modal("Ubah WiFi", `
+    <p class="muted" style="margin-bottom:6px">${esc(d.name || d.serial)} · SSID #${esc(idx)}</p>
+    <label for="wS">Nama WiFi (SSID)</label><input id="wS" type="text" maxlength="32" value="${esc(ssid)}">
+    <label for="wP">Password baru</label><input id="wP" type="text" maxlength="63" placeholder="Kosongkan jika tidak diganti" autocomplete="off">
+    <div class="help">8–63 karakter. Perubahan dikirim ke ONT; jika ONT tidak langsung menjawab, dijalankan saat ONT melapor berikutnya.</div>
+    <div class="err" id="wErr"></div>`, `<button class="btn" data-act="close">Batal</button><button class="btn pri" id="wOk">Simpan</button>`);
+  $("#wOk").onclick = async () => {
+    const b = $("#wOk"); $("#wErr").textContent = ""; busy(b, true);
+    const s = $("#wS").value.trim(), p = $("#wP").value;
+    try { const r = await api("device/wifi", { method: "POST", body: { id: d.id, index: idx, ssid: s !== ssid ? s : "", pass: p } }); closeModal(); toast(r.msg); } catch (e) { $("#wErr").textContent = e.message; busy(b, false); }
+  };
+}
+function tagDialog(d) {
+  let labels = d.labels.slice();
+  const draw = () => { $("#tL").innerHTML = labels.map((t, i) => `<span class="tag blue">${esc(t.replace(/_/g, " "))}<button type="button" data-rm="${i}" aria-label="Hapus">${ic("x")}</button></span>`).join("") || `<span class="muted small">Belum ada label</span>`; $("#tL").querySelectorAll("[data-rm]").forEach((b) => (b.onclick = () => { labels.splice(+b.dataset.rm, 1); draw(); })); };
+  modal("Pelanggan & label", `
+    <label for="tN">Nama pelanggan</label><input id="tN" type="text" maxlength="60" value="${esc(d.name)}" placeholder="contoh: Budi Santoso">
+    <div class="help">Disimpan sebagai tag GenieACS <span class="mono">nama:Budi_Santoso</span>. Router tidak perlu ditulis: sudah dikenali otomatis dari IP virtual di panel utama.</div>
+    <label for="tA">Label</label><div class="labels" id="tL" style="min-height:24px"></div>
+    <div class="tag-in"><input id="tA" type="text" maxlength="40" placeholder="contoh: ODP-03, VIP, Dusun A"><button type="button" class="btn" id="tAdd">${ic("plus")}Tambah</button></div>
+    <div class="help">Label untuk mengelompokkan dan mencari ONT (area, ODP, paket, dll). Spasi diubah menjadi garis bawah di GenieACS.</div>
+    <div class="err" id="tErr"></div>`, `<button class="btn" data-act="close">Batal</button><button class="btn pri" id="tOk">Simpan</button>`, "md");
+  draw();
+  const add = () => { const v = $("#tA").value.trim(); if (!v) return; if (!labels.some((x) => x.toLowerCase() === v.replace(/\s+/g, "_").toLowerCase())) labels.push(v.replace(/\s+/g, "_")); $("#tA").value = ""; draw(); $("#tA").focus(); };
+  $("#tAdd").onclick = add;
+  $("#tA").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); add(); } };
+  $("#tOk").onclick = async () => {
+    const b = $("#tOk"); $("#tErr").textContent = ""; busy(b, true);
+    try { await api("device/tags", { method: "POST", body: { id: d.id, name: $("#tN").value, labels } }); closeModal(); toast("Nama dan label disimpan"); viewDevice($("#view"), d.id); } catch (e) { $("#tErr").textContent = e.message; busy(b, false); }
+  };
+}
+
+/* ================= Faults ================= */
+async function viewFaults(v) {
+  crumb([["Dashboard", "#/"], ["Faults"]]);
+  v.innerHTML = ""; loading(v);
+  let r;
+  try { r = await api("faults"); } catch (e) { v.innerHTML = errNote(e.message); return; }
+  const F = r.faults.sort((a, b) => b.timestamp - a.timestamp);
+  v.innerHTML = `
+    <div class="ph"><div><h1>Faults</h1><p>Kesalahan saat GenieACS menjalankan perintah ke ONT. Hapus fault agar perintah bisa dicoba lagi.</p></div>
+      <div class="acts">${F.length ? `<button class="btn danger" id="fAll">${ic("trash")}Hapus semua</button>` : ""}</div></div>
+    <div class="card"><div class="ch"><h2>Daftar fault</h2><span class="sub">${nf(F.length)}</span></div>
+      ${F.length ? `<div class="tw"><table class="t"><thead><tr><th>ONT</th><th>Kode</th><th class="hide-sm">Pesan</th><th class="hide-md">Percobaan</th><th>Waktu</th><th class="r"></th></tr></thead><tbody>
+        ${F.map((f) => `<tr><td><a href="#/ont/${encodeURIComponent(f.device)}"><b style="font-weight:600">${esc(f.name || f.serial || f.device)}</b></a><div class="muted small">${esc(f.channel)}</div></td><td class="mono small">${esc(f.code)}</td><td class="hide-sm small" style="max-width:420px">${esc(f.message)}</td><td class="hide-md">${esc(f.retries ?? 0)}</td><td class="muted small">${ago(f.timestamp)}</td><td class="r"><button class="btn sm ghost danger" data-del="${esc(f.id)}" aria-label="Hapus">${ic("trash")}</button></td></tr>`).join("")}
+      </tbody></table></div>` : `<div class="empty"><div class="big">${ic("check")}</div><h3>Tidak ada fault</h3><p>Semua perintah ke ONT berjalan normal.</p></div>`}
+    </div>`;
+  paintIcons(v);
+  v.querySelectorAll("[data-del]").forEach((b) => (b.onclick = async () => { busy(b, true); try { await api("faults", { method: "DELETE", body: { id: b.dataset.del } }); toast("Fault dihapus"); loadData().catch(() => {}); viewFaults(v); } catch (e) { toast(e.message, true); busy(b, false); } }));
+  const all = $("#fAll"); if (all) all.onclick = () => confirmBox("Hapus semua fault?", `${F.length} fault dihapus dari GenieACS. Perintah yang gagal akan dicoba lagi saat ONT melapor.`, "Hapus semua", true, async () => { const x = await api("faults", { method: "DELETE", body: { all: true } }); closeModal(); toast(`${x.count} fault dihapus`); loadData().catch(() => {}); viewFaults(v); });
+}
+
+/* ================= Pengaturan ================= */
+async function viewSettings(v) {
+  crumb([["Dashboard", "#/"], ["Pengaturan"]]);
+  v.innerHTML = ""; loading(v);
+  let S;
+  try { S = await api("settings"); } catch (e) { v.innerHTML = errNote(e.message); return; }
+  const rx = S.rx, last = rx.last;
+  v.innerHTML = `
+    <div class="ph"><div><h1>Pengaturan</h1><p>Koneksi GenieACS, batas redaman, history, dan akun admin.</p></div></div>
+    <div class="grid2">
+      <div class="stack">
+        <div class="card"><div class="ch"><h2>Koneksi GenieACS</h2>${STATUS && STATUS.nbi.ok ? `<span class="pill ok">Terhubung</span>` : `<span class="pill bad">Terputus</span>`}</div>
+          <form class="cb" id="fNbi">
+            <label for="sUrl">Alamat NBI</label><input id="sUrl" type="text" value="${esc(S.acs_url)}">
+            <div class="help">NBI GenieACS (bawaan <span class="mono">http://127.0.0.1:7557</span>), bukan web UI port 3000.${S.link && S.link.nbi ? ` Panel utama memakai <span class="mono">${esc(S.link.nbi)}</span>.` : ""}</div>
+            <div class="row2"><div><label for="sUser">User NBI</label><input id="sUser" type="text" value="${esc(S.acs_user)}" placeholder="kosong jika tanpa login"></div>
+              <div><label for="sPass">Password NBI</label><input id="sPass" type="password" placeholder="${S.acs_pass_set ? "tersimpan — kosongkan jika tidak diganti" : "kosong"}"></div></div>
+            <div class="err" id="eNbi"></div>
+            <div class="form-actions"><button type="button" class="btn" id="tNbi">${ic("link")}Tes koneksi</button><button class="btn pri">Simpan</button></div>
+          </form></div>
+        <div class="card"><div class="ch"><h2>Status online & redaman</h2></div>
+          <form class="cb" id="fMon">
+            <label class="check" style="margin-top:0"><input type="checkbox" id="sAuto" ${S.online_auto ? "checked" : ""}> Batas offline otomatis (2× interval inform + 1 menit)</label>
+            <label for="sMin">Batas offline manual (menit)</label><input id="sMin" type="number" min="1" max="1440" value="${esc(S.online_minutes)}" style="max-width:160px">
+            <div class="help">Dipakai bila interval inform ONT tidak diketahui atau mode otomatis dimatikan.</div>
+            <div class="row2"><div><label for="sGood">Baik jika ≥ (dBm)</label><input id="sGood" type="number" step="0.5" value="${esc(S.rx_good)}"></div><div><label for="sFair">Cukup jika ≥ (dBm)</label><input id="sFair" type="number" step="0.5" value="${esc(S.rx_fair)}"></div></div>
+            <div class="help">Di bawah batas "Cukup" dianggap redaman buruk.</div>
+            <label for="sDrop">Tanda memburuk jika turun ≥ (dB dalam 24 jam)</label><input id="sDrop" type="number" step="0.5" min="0.5" value="${esc(S.rx_drop_db)}" style="max-width:160px">
+            <div class="err" id="eMon"></div>
+            <div class="form-actions"><button class="btn pri">Simpan</button></div>
+          </form></div>
+      </div>
+      <div class="stack">
+        <div class="card"><div class="ch"><h2>History redaman</h2>${S.provision ? `<span class="pill ok">Provision aktif</span>` : S.provision === false ? `<span class="pill warn">Provision belum dipasang</span>` : ""}</div>
+          <div class="cb">
+            <p class="muted small" style="line-height:1.6">Redaman semua ONT dicatat tiap 15 menit, disimpan ${esc(S.rx_keep_days)} hari. Provision <span class="mono">panel-acs-rx</span> membuat GenieACS membaca ulang redaman setiap inform berkala, sehingga grafik selalu terisi.</p>
+            <div class="kv" style="padding:10px 0"><span>Pencatatan terakhir</span><b>${last ? `${ago(last.at)} · ${nf(last.devices)} ONT, ${nf(last.saved)} titik baru` : "belum pernah"}</b></div>
+            <div class="kv" style="padding:10px 0"><span>Data tersimpan</span><b>${nf(rx.points)} titik · ${nf(rx.devs)} ONT${rx.since ? " · sejak " + fmtT(rx.since).split(",")[0] : ""} · ${(rx.size / 1048576).toFixed(1).replace(".", ",")} MB</b></div>
+            <label for="sKeep">Simpan selama (hari)</label><input id="sKeep" type="number" min="14" max="730" value="${esc(S.rx_keep_days)}" style="max-width:160px">
+            <div class="err" id="eRx"></div>
+            <div class="form-actions" style="justify-content:flex-start">${S.provision ? `<button class="btn danger" id="pRm">Hapus provision</button>` : `<button class="btn pri" id="pIn">${ic("check")}Pasang provision</button>`}<button class="btn" id="rxNow">${ic("refresh")}Catat sekarang</button><button class="btn" id="kSave">Simpan</button></div>
+          </div></div>
+        <div class="card"><div class="ch"><h2>Panel utama</h2>${STATUS && STATUS.panel.linked ? (STATUS.panel.ok && !STATUS.panel.error ? `<span class="pill ok">Terhubung</span>` : `<span class="pill bad">Bermasalah</span>`) : `<span class="pill gray">Mandiri</span>`}</div>
+          ${S.link ? `<div class="kv"><span>Alamat</span><b class="mono">${esc(S.link.url)}</b></div><div class="kv"><span>Router terbaca</span><b>${STATUS ? nf(STATUS.panel.routers) : "—"}</b></div>${STATUS && STATUS.panel.error ? `<div class="cb" style="padding-top:0"><div class="err" style="margin:0">${esc(STATUS.panel.error)}</div></div>` : ""}`
+            : `<div class="cb muted small">Tidak dipasang lewat panel utama. ONT tidak dikelompokkan per router.</div>`}
+        </div>
+        <div class="card"><div class="ch"><h2>Akun admin</h2></div>
+          <form class="cb" id="fAcc">
+            <label for="aU">Username</label><input id="aU" type="text" value="${esc(S.admin_user)}" autocomplete="username">
+            <div class="row2"><div><label for="aO">Password sekarang</label><input id="aO" type="password" autocomplete="current-password"></div><div><label for="aN">Password baru</label><input id="aN" type="password" autocomplete="new-password" placeholder="kosong jika tidak diganti"></div></div>
+            <div class="err" id="eAcc"></div>
+            <div class="form-actions"><button class="btn pri">Simpan akun</button></div>
+          </form></div>
+      </div>
+    </div>`;
+  paintIcons(v);
+  const save = async (form, body, errId, msg) => { const b = form.querySelector("button.pri"); $(errId).textContent = ""; busy(b, true); try { await api("settings", { method: "PUT", body }); toast(msg); } catch (e) { $(errId).textContent = e.message; } busy(b, false); };
+  $("#fNbi").onsubmit = async (e) => { e.preventDefault(); await save(e.target, { acs_url: $("#sUrl").value, acs_user: $("#sUser").value, acs_pass: $("#sPass").value }, "#eNbi", "Koneksi GenieACS disimpan"); loadStatus(); };
+  $("#tNbi").onclick = async () => { const b = $("#tNbi"); busy(b, true); $("#eNbi").textContent = ""; try { const r = await api("settings/test", { method: "POST", body: { acs_url: $("#sUrl").value, acs_user: $("#sUser").value, acs_pass: $("#sPass").value } }); toast(r.msg); } catch (e) { $("#eNbi").textContent = e.message; } busy(b, false); };
+  $("#fMon").onsubmit = (e) => { e.preventDefault(); save(e.target, { online_auto: $("#sAuto").checked, online_minutes: $("#sMin").value, rx_good: $("#sGood").value, rx_fair: $("#sFair").value, rx_drop_db: $("#sDrop").value }, "#eMon", "Pengaturan disimpan"); };
+  $("#kSave").onclick = async () => { const b = $("#kSave"); busy(b, true); try { await api("settings", { method: "PUT", body: { rx_keep_days: $("#sKeep").value } }); toast("Disimpan"); } catch (e) { $("#eRx").textContent = e.message; } busy(b, false); };
+  $("#rxNow").onclick = async () => { const b = $("#rxNow"); busy(b, true); try { const r = await api("rx/collect", { method: "POST" }); toast(r.msg); viewSettings(v); } catch (e) { $("#eRx").textContent = e.message; busy(b, false); } };
+  const pin = $("#pIn"); if (pin) pin.onclick = async () => { busy(pin, true); try { const r = await api("rx/provision", { method: "POST", body: {} }); toast(r.msg); viewSettings(v); } catch (e) { $("#eRx").textContent = e.message; busy(pin, false); } };
+  const prm = $("#pRm"); if (prm) prm.onclick = () => confirmBox("Hapus provision redaman?", "GenieACS tidak lagi membaca ulang redaman setiap inform. Data history yang sudah tersimpan tidak dihapus.", "Hapus", true, async () => { await api("rx/provision", { method: "POST", body: { remove: true } }); closeModal(); toast("Provision dihapus"); viewSettings(v); });
+  $("#fAcc").onsubmit = async (e) => { e.preventDefault(); const b = e.target.querySelector("button.pri"); $("#eAcc").textContent = ""; busy(b, true); try { await api("account", { method: "PUT", body: { user: $("#aU").value, old: $("#aO").value, pass: $("#aN").value } }); toast("Akun disimpan"); $("#aO").value = ""; $("#aN").value = ""; ME.user = $("#aU").value; $("#sUser").textContent = ME.user; } catch (er) { $("#eAcc").textContent = er.message; } busy(b, false); };
+}
+
+/* ================= Login & mulai ================= */
+function showLogin() {
+  $("#appView").classList.add("hidden"); $("#loginView").classList.remove("hidden");
+  const setup = ME && ME.setup;
+  $("#lTitle").textContent = ME ? ME.appName : "Panel ACS";
+  $("#lSub").textContent = setup ? "Buat akun admin pertama" : "Monitoring ONT dari GenieACS";
+  $("#lBtn").textContent = setup ? "Buat akun" : "Masuk";
+  ["#lp2", "#lp2L"].forEach((s) => $(s).classList.toggle("hidden", !setup));
+  $("#lp").autocomplete = setup ? "new-password" : "current-password";
+  $("#lu").value = $("#lu").value || (setup ? "admin" : "");
+  setTimeout(() => ($("#lu").value ? $("#lp") : $("#lu")).focus(), 30);
+}
+$("#loginForm").onsubmit = async (e) => {
+  e.preventDefault(); $("#lErr").textContent = "";
+  const setup = ME && ME.setup;
+  if (setup && $("#lp").value !== $("#lp2").value) { $("#lErr").textContent = "Password tidak sama."; return; }
+  busy($("#lBtn"), true);
+  try { await api(setup ? "setup" : "login", { method: "POST", body: { user: $("#lu").value, pass: $("#lp").value } }); $("#lp").value = ""; $("#lp2").value = ""; await start(); }
+  catch (er) { $("#lErr").textContent = er.message; }
+  busy($("#lBtn"), false);
+};
+function theme(t) {
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("pacs-theme", t); } catch (e) {}
+  $("#thTx").textContent = t === "dark" ? "Mode terang" : "Mode gelap";
+  const n = $("#thTx").previousElementSibling; if (n) n.innerHTML = ic(t === "dark" ? "sun" : "moon");
+  if (CHART && DEV) drawRx(DEV.id);
+}
+document.addEventListener("click", async (e) => {
+  const go = e.target.closest("[data-go]");
+  if (go && !e.target.closest("a,button:not([data-go])")) { if (location.hash === go.dataset.go) route(); else location.hash = go.dataset.go; return; }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const act = a.dataset.act;
+  if (act === "close") closeModal();
+  else if (act === "opennav") document.body.classList.add("nav-open");
+  else if (act === "closenav") document.body.classList.remove("nav-open");
+  else if (act === "theme") theme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+  else if (act === "refresh") { a.classList.add("spinning"); try { await Promise.all([loadData(true), loadStatus(true)]); await route(); toast("Data diperbarui"); } catch (er) { toast(er.message, true); } a.classList.remove("spinning"); }
+  else if (act === "logout") confirmBox("Keluar?", "Anda perlu login lagi untuk membuka Panel ACS.", "Keluar", false, async () => { await api("logout", { method: "POST" }); closeModal(); ME.loggedIn = false; showLogin(); });
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+async function start() {
+  ME = await api("me");
+  document.title = ME.appName;
+  $("#bName").textContent = ME.appName;
+  if (!ME.loggedIn) return showLogin();
+  $("#loginView").classList.add("hidden"); $("#appView").classList.remove("hidden");
+  $("#sUser").textContent = ME.user; $("#sVer").textContent = "v" + ME.version;
+  loadStatus();
+  route();
+}
+(function () {
+  let t = "light"; try { t = localStorage.getItem("pacs-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+  paintIcons(); theme(t);
+  start().catch((e) => { document.body.innerHTML = `<div style="padding:40px;font-family:sans-serif">Panel ACS tidak bisa dimuat: ${esc(e.message)}</div>`; });
+  // Data disegarkan tiap menit (kecuali saat dialog terbuka)
+  setInterval(async () => { if (!ME || !ME.loggedIn || $("#modalRoot").innerHTML || document.hidden) return; try { await Promise.all([loadData(true), loadStatus()]); if (/^#\/?$|^#\/ont$|^$/.test(location.hash.split("?")[0])) route(); } catch (e) {} }, 60000);
+})();
+</script>
+</body>
+</html>

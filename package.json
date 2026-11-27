@@ -1,0 +1,10 @@
+{
+  "name": "panel-acs",
+  "version": "3.0.0",
+  "description": "Monitoring ONT dari GenieACS: redaman, WiFi, nama pelanggan, router dari panel utama (ACS NETMAP Panel)",
+  "main": "server.js",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=22.13" },
+  "scripts": { "start": "node --disable-warning=ExperimentalWarning server.js" }
+}
