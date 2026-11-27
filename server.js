@@ -20,7 +20,7 @@ const DB_FILE = path.join(DATA_DIR, "panel-acs.db");
 const LINK_FILE = path.join(DATA_DIR, "panel-link.json");
 const PORT = parseInt(process.env.PORT, 10) || 8091;
 const HOST = process.env.HOST || "127.0.0.1";
-const VERSION = "3.0.0";
+const VERSION = "3.1.0";
 const RX_RAW_DAYS = 7;
 const RX_PROVISION = "panel-acs-rx";
 const COLLECT_MS = 15 * 60 * 1000;
@@ -754,7 +754,7 @@ function readBody(req) {
     req.on("error", reject);
   });
 }
-const STATIC = { "/": ["public/index.html", "text/html; charset=utf-8"], "/index.html": ["public/index.html", "text/html; charset=utf-8"], "/assets/chart.umd.js": ["assets/chart.umd.js", "application/javascript; charset=utf-8"] };
+const STATIC = { "/": ["public/index.html", "text/html; charset=utf-8"], "/index.html": ["public/index.html", "text/html; charset=utf-8"], "/assets/chart.umd.js": ["assets/chart.umd.js", "application/javascript; charset=utf-8"], "/assets/wix-latin.woff2": ["assets/wix-latin.woff2", "font/woff2"], "/assets/wix-latin-ext.woff2": ["assets/wix-latin-ext.woff2", "font/woff2"] };
 const SEC_HEADERS = { "X-Content-Type-Options": "nosniff", "X-Frame-Options": "SAMEORIGIN", "Referrer-Policy": "same-origin" };
 function serveStatic(req, res, p) {
   const f = STATIC[p];

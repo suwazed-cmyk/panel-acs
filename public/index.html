@@ -8,26 +8,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  @font-face{font-family:"Wix Madefor Text";font-style:normal;font-display:swap;font-weight:400 800;src:url(assets/wix-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Wix Madefor Text";font-style:normal;font-display:swap;font-weight:400 800;src:url(assets/wix-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+20A0-20AB,U+20AD-20C0,U+2C60-2C7F,U+A720-A7FF}
   :root{
     color-scheme:light;
-    --bg:#f6f7fb;--surface:#fff;--subtle:#f8f9fc;--hover:#f3f5fa;
-    --line:#e7e9f0;--line-2:#d9dde7;
-    --text:#1f2633;--text-2:#4b5565;--muted:#7b8494;
-    --primary:#1d4ed8;--primary-hover:#1e40af;--primary-soft:#eef3ff;--ring:rgba(29,78,216,.18);
-    --ok:#16a34a;--ok-soft:#ecfdf3;--warn:#d97706;--warn-soft:#fffbeb;--bad:#dc2626;--bad-soft:#fef2f2;
-    --side:#0f2a6b;--side-text:rgba(255,255,255,.72);--side-hover:rgba(255,255,255,.07);--side-on:rgba(255,255,255,.12);
-    --r:12px;--r-sm:8px;--shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.03);--shadow-lg:0 18px 48px -12px rgba(16,24,40,.28);
-    --font:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --bg:#f8f8fa;--surface:#fff;--subtle:#f8f9fb;--hover:#f3f6f9;
+    --line:#eaedf1;--line-2:#d8dfe7;
+    --text:#5d7186;--text-2:#5d7186;--muted:#8486a7;--head:#313b5e;
+    --primary:#1c84ee;--primary-hover:#1670cb;--primary-soft:#e8f2fd;--ring:rgba(28,132,238,.18);
+    --ok:#22c55e;--ok-soft:#e9f9ef;--warn:#f9b931;--warn-soft:#fef8ea;--bad:#ef5f5f;--bad-soft:#fdefef;
+    --side:#fff;--side-text:#8486a7;--side-on:#f4f8fe;--side-lbl:#a3a8c0;--side-line:#eaedf1;--top:#fff;--search:#f3f5f8;
+    --r:.3rem;--r-sm:.3rem;--shadow:0 3px 4px 0 rgba(0,0,0,.03);--shadow-lg:0 10px 30px -6px rgba(30,40,60,.18);
+    --font:"Wix Madefor Text",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
     --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
   [data-theme="dark"]{
     color-scheme:dark;
-    --bg:#0d1117;--surface:#151b24;--subtle:#1a212c;--hover:#1d2531;
-    --line:#252e3b;--line-2:#323d4d;
-    --text:#e6ebf2;--text-2:#b4bdcb;--muted:#8591a3;
-    --primary:#5b8cff;--primary-hover:#7aa2ff;--primary-soft:#18243f;--ring:rgba(91,140,255,.25);
-    --ok:#3ccf74;--ok-soft:#10291b;--warn:#f0a73a;--warn-soft:#2c2111;--bad:#f26b6b;--bad-soft:#2d1516;
-    --side:#0b1530;--shadow:0 1px 2px rgba(0,0,0,.3);
+    --bg:#22282e;--surface:#282f36;--subtle:#2d353c;--hover:#2f373f;
+    --line:#353e47;--line-2:#3f4952;
+    --text:#aab5c0;--text-2:#aab5c0;--muted:#8a96a3;--head:#e3e8ee;
+    --primary:#3b95f0;--primary-hover:#62aaf3;--primary-soft:#1f3347;--ring:rgba(59,149,240,.25);
+    --ok:#38d071;--ok-soft:#1d3527;--warn:#f9b931;--warn-soft:#3a3221;--bad:#f27474;--bad-soft:#3d2629;
+    --side:#262d34;--side-text:#9097a7;--side-on:#2c3640;--side-lbl:#6f7888;--side-line:#30383f;--top:#22282e;--search:#2b3239;--shadow:0 3px 4px 0 rgba(0,0,0,.12);
   }
   *,*::before,*::after{box-sizing:border-box}
   html,body{margin:0}
@@ -261,17 +263,113 @@
   .login-box p{color:var(--muted);font-size:13px}
   .login-box .btn{width:100%;height:40px;margin-top:20px}
 
+
+  /* ===== gaya Reback (CSS ditulis sendiri) ===== */
+  h1,h2,h3,.cust b,.list .grow b,.rt-row b,.kv b,.stat b,.kpi b{color:var(--head)}
+  .side{width:260px;background:var(--side);border-right:1px solid var(--side-line);padding:0 0 12px;overflow-y:auto}
+  .brand{justify-content:center;height:70px;padding:0 20px;color:var(--head);flex:none}
+  .brand-mark{background:var(--primary);color:#fff;border-radius:8px}
+  .brand b{font-size:17px;font-weight:700;color:var(--head)}
+  .brand small{color:var(--muted);font-weight:500}
+  .navlbl{padding:18px 25px 8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--side-lbl)}
+  .nav{gap:12px;padding:10px 25px;margin:0;border-radius:0;color:var(--side-text);font-size:14.5px;position:relative}
+  .nav:hover{background:none;color:var(--primary)}
+  .nav.on{background:var(--side-on);color:var(--head);font-weight:600}
+  .nav.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary)}
+  .nav.on svg{color:var(--primary)}
+  .nav .cnt{background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .nav .cnt.bad{background:var(--bad);color:#fff}
+  .side-foot{border-top:0;padding:12px 25px 0;color:var(--side-lbl)}
+  .main{margin-left:260px}
+  .top{height:70px;gap:6px;padding:0 24px;background:var(--top);border-bottom:0;box-shadow:0 2px 8px rgba(30,40,60,.05)}
+  [data-theme="dark"] .top{box-shadow:0 1px 0 var(--line)}
+  .tsearch{position:relative;width:300px;max-width:100%}
+  .tsearch svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+  .tsearch input{height:40px;padding-left:38px;background:var(--search);border-color:transparent}
+  .tsearch input:focus{background:var(--surface)}
+  .icon-btn{width:40px;height:40px;border-radius:50%}
+  .icon-btn:hover{color:var(--primary)}
+  .icon-btn svg{width:20px;height:20px}
+  .chip-st{height:32px;border:0;background:var(--search);border-radius:var(--r);padding:0 12px;color:var(--head)}
+  .umenu{position:relative}
+  .umenu>button{display:flex;align-items:center;gap:8px;height:40px;padding:0 6px 0 8px;border:0;background:none;border-radius:var(--r);color:var(--head);font-weight:600}
+  .umenu>button:hover{background:var(--hover)}
+  .umenu>button .uic{width:30px;height:30px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+  .umenu>button .uic svg{width:17px;height:17px}
+  .umenu>button>span:last-child svg{width:14px;height:14px;color:var(--muted);transform:rotate(90deg)}
+  .umlist{position:absolute;right:0;top:calc(100% + 14px);width:210px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-lg);padding:6px;z-index:50}
+  .umlist .umh{padding:8px 10px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:6px}
+  .umlist .umh b{display:block;font-size:14px;color:var(--head)}
+  .umlist button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;background:none;border-radius:var(--r);text-align:left;color:var(--text-2);font-size:13.5px}
+  .umlist button:hover{background:var(--hover)}
+  .umlist button.out{color:var(--bad)}
+  .umlist svg{width:16px;height:16px}
+  .content{padding:24px;max-width:none}
+  .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin:0 0 6px}
+  .pbar h1{font-size:18px;font-weight:600;color:var(--head)}
+  .crumb{font-size:14px;color:var(--text-2);gap:6px}
+  .crumb a{color:var(--text-2)}.crumb a:hover{color:var(--primary)}
+  .crumb b{color:var(--head);font-weight:500}
+  .crumb svg{width:14px;height:14px;color:var(--muted)}
+  .ph{align-items:center;margin-bottom:20px}
+  .ph h1{display:none}
+  .ph p{margin-top:0;color:var(--muted)}
+  .card{border:0;border-radius:var(--r)}
+  [data-theme="dark"] .card,[data-theme="dark"] .kpi{border:1px solid var(--line)}
+  .stack>*+*{margin-top:24px}
+  .ch{padding:16px 20px;min-height:60px}
+  .ch h2{font-size:16px;font-weight:600}
+  .cb{padding:20px}
+  .btn{height:38px;border-radius:var(--r);font-weight:500;padding:0 16px}
+  .btn.sm{height:32px;padding:0 11px}
+  input[type=text],input[type=password],input[type=number],input[type=search],select,textarea{border-radius:var(--r);color:var(--head)}
+  label{color:var(--head);font-weight:500}
+  .kpis{gap:24px;margin-bottom:24px}
+  .kpi{border:0;padding:20px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ic lb" "ic num" "mt mt" "sm sm";column-gap:16px;text-align:right}
+  .kpi .kh{display:contents}
+  .kpi .kh .ki{grid-area:ic;width:52px;height:52px;border-radius:var(--r);align-self:start}
+  .kpi .kh .ki svg{width:24px;height:24px}
+  .kpi .kl{grid-area:lb;font-size:14px;color:var(--text-2);align-self:end}
+  .kpi small{text-align:left;margin-top:12px}
+  .kpi b{grid-area:num;font-size:22px;font-weight:600;margin-top:2px;letter-spacing:-.01em}
+  .kpi small{grid-area:sm}
+  .kpi .meter{grid-area:mt}
+  .grid-main,.grid2,.det{gap:24px}
+  table.t th{font-size:13.5px;color:var(--head);padding:12px 16px}
+  table.t td{padding:12px 16px}
+  table.t th:first-child,table.t td:first-child{padding-left:20px}
+  table.t th:last-child,table.t td:last-child{padding-right:20px}
+  .pill{background:none!important;border:0!important;padding:0;height:auto;font-size:13.5px;font-weight:500;color:var(--text-2)!important}
+  .pill::before{width:8px;height:8px}
+  .pill.ok::before{background:var(--ok)}.pill.bad::before{background:var(--bad)}.pill.warn::before{background:var(--warn)}.pill.info::before{background:var(--primary)}.pill.gray::before{background:var(--muted)}
+  .st.on i,.st.off i{box-shadow:none}
+  .tag{border-radius:var(--r)}
+  .search input{background:var(--search);border-color:transparent}
+  .search input:focus{background:var(--surface)}
+  .seg{border-radius:var(--r)}
+  .note{border-radius:var(--r)}
+  .modal{border-radius:var(--r)}
+  .dh .av{border-radius:var(--r)}
+  .dh h1{font-size:20px;font-weight:600}
+  .login{background:var(--bg)}
+  .login-box{border-radius:var(--r);box-shadow:0 10px 30px -10px rgba(30,40,60,.15);padding:32px}
+  .login-box h1{color:var(--head)}
   @media (max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.grid-main,.det{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}}
   @media (max-width:900px){
     .side{transform:translateX(-100%)}body.nav-open .side{transform:none}
     .main{margin-left:0}.menu-btn{display:grid}
-    .top{padding:0 14px}.content{padding:18px 14px}
+    .top{padding:0 10px;height:62px}.content{padding:14px 12px}
+    .tsearch{flex:1;width:auto;min-width:0}.tsearch input{padding-left:34px}.tsearch svg{left:11px}
+    .umenu>button .un,.umenu>button>span:last-child{display:none}
+    .pbar .crumb{display:none}.pbar h1{font-size:17px}
+    .kpis,.grid-main,.grid2,.det{gap:12px}.kpis{margin-bottom:12px}.stack>*+*{margin-top:12px}
     .grid2{grid-template-columns:minmax(0,1fr)}
     .hide-md{display:none}
     .conn .chip-st span{display:none}
   }
   @media (max-width:600px){
-    .kpis{gap:10px}.kpi{padding:14px}.kpi b{font-size:23px}
+    .kpi{padding:14px;column-gap:12px}.kpi .kh .ki{width:40px;height:40px}.kpi b{font-size:19px}.kpi .kl{font-size:12.5px}
+    .conn{display:none}
     .hide-sm{display:none}
     .row2{grid-template-columns:1fr}
     .ph h1{font-size:22px}
@@ -298,25 +396,29 @@
 <div id="appView" class="hidden">
   <aside class="side">
     <div class="brand"><span class="brand-mark" data-ic="wifi"></span><div><b id="bName">Panel ACS</b><small>Monitoring ONT</small></div></div>
+    <div class="navlbl">Utama</div>
     <button class="nav" data-go="#/"><span data-ic="home"></span>Dashboard</button>
+    <div class="navlbl">Perangkat</div>
     <button class="nav" data-go="#/ont"><span data-ic="ont"></span>ONT<span class="cnt hidden" id="nCnt"></span></button>
     <button class="nav" data-go="#/faults"><span data-ic="alert"></span>Faults<span class="cnt bad hidden" id="fCnt"></span></button>
+    <div class="navlbl">Sistem</div>
     <button class="nav" data-go="#/pengaturan"><span data-ic="gear"></span>Pengaturan</button>
     <div class="grow"></div>
-    <button class="nav" data-act="theme"><span data-ic="moon"></span><span id="thTx">Mode gelap</span></button>
-    <button class="nav" data-act="logout"><span data-ic="logout"></span>Keluar</button>
-    <div class="side-foot"><span id="sUser"></span><span id="sVer"></span></div>
+    <div class="side-foot"><span id="sVer"></span></div>
   </aside>
   <div class="backdrop" data-act="closenav"></div>
   <div class="main">
     <header class="top">
       <button class="icon-btn menu-btn" data-act="opennav" aria-label="Menu"><span data-ic="menu"></span></button>
-      <div class="crumb" id="crumb"></div>
+      <form class="tsearch" id="tSearch" role="search"><span data-ic="search"></span><input type="search" id="tq" placeholder="Cari ONT: nama, SN, PPPoE, IP…" aria-label="Cari ONT" autocomplete="off"></form>
       <div class="sp"></div>
       <div class="conn" id="conn"></div>
       <button class="icon-btn" data-act="refresh" title="Muat ulang data" aria-label="Muat ulang"><span data-ic="refresh"></span></button>
+      <button class="icon-btn" data-act="theme" id="thBtn" title="Tampilan gelap / terang" aria-label="Ganti tampilan gelap atau terang"><span data-ic="moon"></span></button>
+      <div class="umenu"><button type="button" data-act="umenu" aria-haspopup="true" aria-expanded="false" id="umBtn"><span class="uic" data-ic="user"></span><span class="un" id="uName"></span><span data-ic="chev"></span></button>
+        <div class="umlist hidden" id="umList"><div class="umh">Masuk sebagai<b id="uName2"></b></div><button data-go="#/pengaturan"><span data-ic="gear"></span>Pengaturan</button><button class="out" data-act="logout"><span data-ic="logout"></span>Keluar</button></div></div>
     </header>
-    <main class="content" id="view"></main>
+    <main class="content"><div class="pbar"><h1 id="pTitle"></h1><nav class="crumb" id="crumb" aria-label="Breadcrumb"></nav></div><div id="view"></div></main>
   </div>
 </div>
 <div id="modalRoot"></div>
@@ -332,6 +434,7 @@ const ICONS = {
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
   refresh: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
@@ -411,7 +514,10 @@ async function loadStatus(force) {
 }
 
 /* ================= Router ================= */
-function crumb(items) { $("#crumb").innerHTML = items.map((x, i) => i < items.length - 1 ? `<a href="${x[1]}">${esc(x[0])}</a><span>/</span>` : `<b>${esc(x[0])}</b>`).join(""); }
+function crumb(items) {
+  $("#pTitle").textContent = items[items.length - 1][0];
+  $("#crumb").innerHTML = `<a href="#/" aria-label="Dashboard">${ic("home")}</a>` + items.map((x, i) => ic("chev") + (i < items.length - 1 ? `<a href="${x[1]}">${esc(x[0])}</a>` : `<b>${esc(x[0])}</b>`)).join("");
+}
 let CHART = null;
 async function route() {
   const h = (location.hash || "#/").split("?")[0];
@@ -457,10 +563,10 @@ async function viewDashboard(v) {
     ${DATA.error ? errNote(DATA.error) : ""}
     ${P.linked && !P.ok ? `<div class="note warn">${ic("alert")}<div><b>Router panel utama belum terbaca</b>${esc(P.error)}. ONT belum bisa dikelompokkan per router.</div></div>` : ""}
     <div class="kpis">
-      <a class="kpi" href="#/ont"><div class="kh"><span class="ki info">${ic("ont")}</span>Total ONT</div><b>${nf(n)}</b><small>${fresh.length ? `${fresh.length} baru dalam 7 hari` : "terdaftar di GenieACS"}</small></a>
-      <a class="kpi" href="#/ont?st=on"><div class="kh"><span class="ki ok">${ic("check")}</span>Online</div><b>${nf(on)}</b><div class="meter"><i class="ok" style="width:${pct(on)}%"></i></div><small>${pct(on)}% dari semua ONT</small></a>
-      <a class="kpi" href="#/ont?st=off"><div class="kh"><span class="ki bad">${ic("power")}</span>Offline</div><b>${nf(off)}</b><div class="meter"><i class="bad" style="width:${pct(off)}%"></i></div><small>${off ? "tidak melapor ke GenieACS" : "semua melapor"}</small></a>
-      <a class="kpi" href="#/ont?rx=poor"><div class="kh"><span class="ki warn">${ic("signal")}</span>Redaman buruk</div><b>${nf(cls.poor)}</b><div class="meter"><i class="warn" style="width:${pct(cls.poor)}%"></i></div><small>di bawah ${DATA.thresholds.fair} dBm</small></a>
+      <a class="kpi" href="#/ont"><div class="kh"><span class="ki info">${ic("ont")}</span><span class="kl">Total ONT</span></div><b>${nf(n)}</b><small>${fresh.length ? `${fresh.length} baru dalam 7 hari` : "terdaftar di GenieACS"}</small></a>
+      <a class="kpi" href="#/ont?st=on"><div class="kh"><span class="ki ok">${ic("check")}</span><span class="kl">Online</span></div><b>${nf(on)}</b><div class="meter"><i class="ok" style="width:${pct(on)}%"></i></div><small>${pct(on)}% dari semua ONT</small></a>
+      <a class="kpi" href="#/ont?st=off"><div class="kh"><span class="ki bad">${ic("power")}</span><span class="kl">Offline</span></div><b>${nf(off)}</b><div class="meter"><i class="bad" style="width:${pct(off)}%"></i></div><small>${off ? "tidak melapor ke GenieACS" : "semua melapor"}</small></a>
+      <a class="kpi" href="#/ont?rx=poor"><div class="kh"><span class="ki warn">${ic("signal")}</span><span class="kl">Redaman buruk</span></div><b>${nf(cls.poor)}</b><div class="meter"><i class="warn" style="width:${pct(cls.poor)}%"></i></div><small>di bawah ${DATA.thresholds.fair} dBm</small></a>
     </div>
     <div class="grid-main">
       <div class="stack">
@@ -779,7 +885,7 @@ async function viewSettings(v) {
   $("#rxNow").onclick = async () => { const b = $("#rxNow"); busy(b, true); try { const r = await api("rx/collect", { method: "POST" }); toast(r.msg); viewSettings(v); } catch (e) { $("#eRx").textContent = e.message; busy(b, false); } };
   const pin = $("#pIn"); if (pin) pin.onclick = async () => { busy(pin, true); try { const r = await api("rx/provision", { method: "POST", body: {} }); toast(r.msg); viewSettings(v); } catch (e) { $("#eRx").textContent = e.message; busy(pin, false); } };
   const prm = $("#pRm"); if (prm) prm.onclick = () => confirmBox("Hapus provision redaman?", "GenieACS tidak lagi membaca ulang redaman setiap inform. Data history yang sudah tersimpan tidak dihapus.", "Hapus", true, async () => { await api("rx/provision", { method: "POST", body: { remove: true } }); closeModal(); toast("Provision dihapus"); viewSettings(v); });
-  $("#fAcc").onsubmit = async (e) => { e.preventDefault(); const b = e.target.querySelector("button.pri"); $("#eAcc").textContent = ""; busy(b, true); try { await api("account", { method: "PUT", body: { user: $("#aU").value, old: $("#aO").value, pass: $("#aN").value } }); toast("Akun disimpan"); $("#aO").value = ""; $("#aN").value = ""; ME.user = $("#aU").value; $("#sUser").textContent = ME.user; } catch (er) { $("#eAcc").textContent = er.message; } busy(b, false); };
+  $("#fAcc").onsubmit = async (e) => { e.preventDefault(); const b = e.target.querySelector("button.pri"); $("#eAcc").textContent = ""; busy(b, true); try { await api("account", { method: "PUT", body: { user: $("#aU").value, old: $("#aO").value, pass: $("#aN").value } }); toast("Akun disimpan"); $("#aO").value = ""; $("#aN").value = ""; ME.user = $("#aU").value; $("#uName").textContent = ME.user; $("#uName2").textContent = ME.user; } catch (er) { $("#eAcc").textContent = er.message; } busy(b, false); };
 }
 
 /* ================= Login & mulai ================= */
@@ -806,30 +912,35 @@ $("#loginForm").onsubmit = async (e) => {
 function theme(t) {
   document.documentElement.dataset.theme = t;
   try { localStorage.setItem("pacs-theme", t); } catch (e) {}
-  $("#thTx").textContent = t === "dark" ? "Mode terang" : "Mode gelap";
-  const n = $("#thTx").previousElementSibling; if (n) n.innerHTML = ic(t === "dark" ? "sun" : "moon");
+  $("#thBtn").innerHTML = ic(t === "dark" ? "sun" : "moon");
   if (CHART && DEV) drawRx(DEV.id);
 }
 document.addEventListener("click", async (e) => {
+  if (!e.target.closest(".umenu")) umenu(false);
   const go = e.target.closest("[data-go]");
   if (go && !e.target.closest("a,button:not([data-go])")) { if (location.hash === go.dataset.go) route(); else location.hash = go.dataset.go; return; }
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act;
+  if (act !== "umenu") umenu(false);
   if (act === "close") closeModal();
+  else if (act === "umenu") umenu($("#umList").classList.contains("hidden"));
   else if (act === "opennav") document.body.classList.add("nav-open");
   else if (act === "closenav") document.body.classList.remove("nav-open");
   else if (act === "theme") theme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   else if (act === "refresh") { a.classList.add("spinning"); try { await Promise.all([loadData(true), loadStatus(true)]); await route(); toast("Data diperbarui"); } catch (er) { toast(er.message, true); } a.classList.remove("spinning"); }
   else if (act === "logout") confirmBox("Keluar?", "Anda perlu login lagi untuk membuka Panel ACS.", "Keluar", false, async () => { await api("logout", { method: "POST" }); closeModal(); ME.loggedIn = false; showLogin(); });
 });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeModal(); umenu(false); } });
+function umenu(open) { const l = $("#umList"); if (!l) return; l.classList.toggle("hidden", !open); $("#umBtn").setAttribute("aria-expanded", open ? "true" : "false"); }
+// cari ONT dari bar atas: buka daftar ONT dengan kata kunci itu
+$("#tSearch").onsubmit = (e) => { e.preventDefault(); LIST.q = $("#tq").value.trim(); LIST.page = 1; $("#tq").blur(); if (location.hash.split("?")[0] === "#/ont") route(); else location.hash = "#/ont"; };
 async function start() {
   ME = await api("me");
   document.title = ME.appName;
   $("#bName").textContent = ME.appName;
   if (!ME.loggedIn) return showLogin();
   $("#loginView").classList.add("hidden"); $("#appView").classList.remove("hidden");
-  $("#sUser").textContent = ME.user; $("#sVer").textContent = "v" + ME.version;
+  $("#uName").textContent = ME.user; $("#uName2").textContent = ME.user; $("#sVer").textContent = ME.appName + " v" + ME.version;
   loadStatus();
   route();
 }
