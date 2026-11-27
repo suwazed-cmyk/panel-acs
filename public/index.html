@@ -11,11 +11,11 @@
   :root{
     color-scheme:light;
     --bg:#f8f8fa;--surface:#fff;--subtle:#f8f9fb;--hover:#f3f6f9;
-    --line:#eaedf1;--line-2:#d8dfe7;
-    --text:#5d7186;--text-2:#5d7186;--muted:#8486a7;--head:#313b5e;
+    --line:#e5e8ec;--line-2:#cfd6de;
+    --text:#1f2937;--text-2:#374151;--muted:#5f6b7a;--head:#111827;
     --primary:#1c84ee;--primary-hover:#1670cb;--primary-soft:#e8f2fd;--ring:rgba(28,132,238,.18);
-    --ok:#22c55e;--ok-soft:#e9f9ef;--warn:#f9b931;--warn-soft:#fef8ea;--bad:#ef5f5f;--bad-soft:#fdefef;
-    --side:#fff;--side-text:#8486a7;--side-on:#f4f8fe;--side-lbl:#a3a8c0;--side-line:#eaedf1;--top:#fff;--search:#f3f5f8;
+    --ok:#15803d;--ok-soft:#e8f6ed;--warn:#b45309;--warn-soft:#fdf3e3;--bad:#dc2626;--bad-soft:#fdeeee;
+    --side:#fff;--side-text:#374151;--side-on:#f4f8fe;--side-lbl:#6b7280;--side-line:#eaedf1;--top:#fff;--search:#f3f5f8;
     --r:.3rem;--r-sm:.3rem;--shadow:0 3px 4px 0 rgba(0,0,0,.03);--shadow-lg:0 10px 30px -6px rgba(30,40,60,.18);
     --font:"Wix Madefor Text",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
     --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -23,11 +23,11 @@
   [data-theme="dark"]{
     color-scheme:dark;
     --bg:#22282e;--surface:#282f36;--subtle:#2d353c;--hover:#2f373f;
-    --line:#353e47;--line-2:#3f4952;
-    --text:#aab5c0;--text-2:#aab5c0;--muted:#8a96a3;--head:#e3e8ee;
+    --line:#3a434d;--line-2:#4a5560;
+    --text:#e8ecf0;--text-2:#d3d9e0;--muted:#a7b1bc;--head:#f8fafc;
     --primary:#3b95f0;--primary-hover:#62aaf3;--primary-soft:#1f3347;--ring:rgba(59,149,240,.25);
     --ok:#38d071;--ok-soft:#1d3527;--warn:#f9b931;--warn-soft:#3a3221;--bad:#f27474;--bad-soft:#3d2629;
-    --side:#262d34;--side-text:#9097a7;--side-on:#2c3640;--side-lbl:#6f7888;--side-line:#30383f;--top:#22282e;--search:#2b3239;--shadow:0 3px 4px 0 rgba(0,0,0,.12);
+    --side:#262d34;--side-text:#d3d9e0;--side-on:#2c3640;--side-lbl:#98a2ae;--side-line:#30383f;--top:#22282e;--search:#2b3239;--shadow:0 3px 4px 0 rgba(0,0,0,.12);
   }
   *,*::before,*::after{box-sizing:border-box}
   html,body{margin:0}
@@ -374,6 +374,11 @@
     table.t th,table.t td{padding:10px 12px}
     .dh .acts{width:100%}.dh .acts .btn{flex:1}
   }
+  /* kontras teks lebih tinggi */
+  body{color:var(--text)}
+  table.t td{color:var(--text)}
+  input::placeholder,textarea::placeholder{color:#8a94a3;opacity:1}
+  [data-theme="dark"] input::placeholder,[data-theme="dark"] textarea::placeholder{color:#8f99a5}
 </style>
 </head>
 <body>
